@@ -1,36 +1,44 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig to read more about this file */
-
-    /* Language and Environment */
-    "target": "es2016",                                  /* 출력되는 JavaScript의 ECMAScript 버전을 지정 */
+    /* 언어 및 환경 설정 */
+    "target": "es2016",                                  /* 출력되는 JavaScript의 ECMAScript 버전 설정 */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
-    ],                                                   /* 컴파일에 포함될 라이브러리 선언 파일을 지정 */
-    "jsx": "react",                                      /* React와 함께 JSX를 사용할 때 생성되는 JSX 코드 형식을 지정 */
+    ],                                                   /* 컴파일에 포함될 라이브러리 선언 파일 목록 */
+    "jsx": "react",                                      /* JSX를 사용하는 React 프로젝트 설정 */
+    
+    /* 모듈 설정 */
+    "module": "esnext",                                  /* ECMAScript 모듈 시스템 사용 설정 */
+    "rootDir": "src",                                    /* 소스 파일이 위치한 루트 디렉토리 경로 */
+    
+    /* JavaScript 파일 포함 설정 */
+    "allowJs": true,                                      /* 프로젝트 내 JavaScript 파일 포함 허용 설정 */
+    
+    /* 출력 설정 */
+    "outDir": "dist",                                    /* 컴파일된 파일이 저장될 디렉토리 경로 */
+   
+    /* 모듈 상호 운용성 설정 */
+    "allowSyntheticDefaultImports": true,                /* 기본 export가 없는 모듈에서 'import x from y' 형식 허용 설정 */
+    "esModuleInterop": true,                             /* ES6 모듈 형식과의 상호 운용성 활성화 */
+    "forceConsistentCasingInFileNames": true,            /* 파일 이름의 대소문자 일관성 강제 설정 */
+   
+    /* 타입 체크 설정 */
+    "strict": true,                                      /* 모든 엄격한 타입 체크 옵션 활성화 설정 */
+    "noFallthroughCasesInSwitch": true,                  /* switch문의 case 사이에 실행 흐름 누락 방지 설정 */
+    "moduleResolution": "node",                          /* Node.js 스타일의 모듈 해석 설정 */
 
-    /* Modules */
-    "module": "commonjs",                                /* 생성되는 모듈 코드의 형식을 지정. Node.js 환경과 호환. */
-    "rootDir": "src",                                    /* 소스 파일이 있는 루트 디렉토리를 지정. */
-
-    /* JavaScript Support */
-    "allowJs": true,                                     /* 프로젝트에 JavaScript 파일 포함을 허용. */
-
-    /* Emit */
-    "outDir": "dist",                                    /* 모든 출력 파일을 위한 출력 폴더를 지정. */
-
-    /* Interop Constraints */
-    "allowSyntheticDefaultImports": true,                /* 기본 export가 없는 모듈에서 'import x from y' 형식을 허용. */
-    "esModuleInterop": true,                             /* CommonJS 모듈을 쉽게 가져올 수 있도록 추가 JavaScript를 출력. */
-    "forceConsistentCasingInFileNames": true,            /* import에서 파일 이름의 대소문자 일관성을 강제. */
-
-    /* Type Checking */
-    "strict": true,                                      /* 모든 엄격한 타입 검사 옵션을 활성화. */
-    "noFallthroughCasesInSwitch": true,                  /* switch문에서 case 사이의 실행 흐름을 방지. */
-
-    /* Completeness */
-    "skipLibCheck": true                                 /* 모든 .d.ts 파일의 타입 검사를 생략. */
-  }
+    /* 라이브러리 검사 설정 */
+    "skipLibCheck": true                                 /* .d.ts 파일에 대한 타입 검사 생략 설정 */
+  },
+  "include": [  //ts. js. 모두 컴파일에 포함
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
