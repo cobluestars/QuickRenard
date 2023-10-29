@@ -1,25 +1,28 @@
 ![QuickRenard Logo](https://github.com/cobluestars/QuickRenard/blob/main/public/QuickRenard.png?raw=true)
 
-🦊Quick Renard🦊
+🦊quickrenard🦊
 
-GraphQL의 원리를 차용하여 React의 props나 상태를 관리하는 라이브러리 🦊Quick Renard🦊를 제작했습니다.
+GraphQL의 원리를 차용하여
+React의 props나 상태를 관리하는 라이브러리,
+
+🦊Quick Renard🦊를 제작했습니다.
 
 Quick Renard는 전역 상태 저장소를 통해 상태를 중앙에서 관리하면서,
 스키마를 통한 유효성 검사와 구독 기반의 상태 변화 알림 메커니즘을 제공하여, 
 React 애플리케이션의 상태 관리를 간편하고 효과적으로 수행할 수 있게 도와주는 도구입니다.
 
 1. 정의 및 설계
-쿼리 기반의 상태 정의: 각 상태를 GraphQL 스키마처럼 정의합니다. 예를 들어, 상태의 타입, 초기 값, 의존성 등을 명시적으로 표현합니다.
+쿼리 기반의 상태 정의: 각 상태를 GraphQL 스키마처럼 정의합니다.
+예를 들어, 상태의 타입, 초기 값, 의존성 등을 명시적으로 표현합니다.
 쿼리 및 변이 작성: 사용자가 상태를 조회하거나 수정할 수 있도록 쿼리와 변이를 제공합니다.
 
 2. 라이브러리 구현
 상태 저장소: 모든 상태를 저장하는 중앙 저장소를 만듭니다.
 쿼리 해석기: 주어진 쿼리를 해석하고 해당하는 상태를 반환하는 로직을 구현합니다.
 변이(Mutation) 처리기: 주어진 변이(Mutation)를 해석하고 상태를 업데이트하는 로직을 구현합니다.
-구독(subscription) 메커니즘: 특정 상태의 변이를 구독하고, 변이가 감지되면 콜백을 실행하는 메커니즘을 구현합니다.
+구독(subscription) 메커니즘: 특정 상태의 변이를 구독(subscription)하고, 변이가 감지되면 콜백을 실행하는 메커니즘을 구현합니다.
 
 3. React Hooks
-
 useStateQuery: 주어진 쿼리에 해당하는 상태를 반환하는 Hook을 제공합니다.
 useStateMutation: 주어진 변이를 실행하는 함수와 상태를 반환하는 Hook을 제공합니다.
 useStateSubscription: 주어진 상태의 변화를 구독하고, 변화가 감지되면 컴포넌트를 리렌더링하는 Hook을 제공합니다.
@@ -59,3 +62,127 @@ Quick Renard 라이브러리에서는 전역적으로 관리되는 stateStore라
 2. 스키마를 사용해 props와 상태의 구조와 타입을 정의하고,
 3. setStateMutation같은 함수에서 유효성 검사를 수행하고 초기 상태를 설정하며, 
 4. setStateSubscription을 이용해 props나 상태를 사용하길 원하는 컴포넌트에서 구독해서 사용
+
+
+❗❗❗ How to use ❗❗❗
+
+# QuickRenard: A Simple State Management in React
+
+QuickRenard(quickrenard) is a lightweight state management solution for React applications. By providing clear paths for data querying, mutation, and subscriptions, QuickRenard streamlines the state-sharing process between components, even if they aren't directly related in the component tree.
+
+## Setup and Initialization
+
+To start using QuickRenard, you first need to define a schema for your state and then initialize the store.
+
+### 1. Define State Schema:
+
+Your state is structured based on a schema. This schema outlines the shape, type, and default values of your state properties.
+
+
+// stateSchema.js
+export const childStateSchema = {
+  type: "object",
+  properties: {
+    data: {
+      type: "string",
+      default: "Initial Data from Child"
+    }
+  }
+};
+
+
+### 2. Initialize Store:
+
+Once you have your schema in place, initialize the state store with it. This sets up the initial state for your application.
+
+
+// stateStore.js
+import { initializeStore } from 'quickrenard';
+import { childStateSchema } from './stateSchema';
+
+initializeStore({
+  childData: childStateSchema.properties
+});
+
+
+## Using QuickRenard in Components
+
+### Querying State:
+
+To access a state property within a component, use the `useStateQuery` hook. This hook queries and retrieves the value of the specified state property.
+
+
+const data = useStateQuery("childData.data");
+
+
+### Mutating State:
+
+For updating the state, use the `useStateMutation` hook. This hook provides a function to update a specific state property and also returns the current value of that property.
+
+
+const [updateChildData, data] = useStateMutation("childData.data");
+
+
+### Subscribing to State Changes:
+
+If you want a component to react to changes in the state, use the `useStateSubscription` hook. It allows you to provide a callback function that will be called whenever the specified state property changes.
+
+
+useStateSubscription("childData.data", handleDataChange);
+
+
+## Example: Sharing State Between Distant Components
+
+Consider a scenario where you have two components, `Child` and `Cousin`, that aren't directly related in the component tree. Yet, you want to share state data between them using QuickRenard.
+
+1. **Child Component**: Mutates the data.
+
+
+// Child.js
+import React from 'react';
+import { useStateMutation } from 'quickrenard';
+
+function Child() {
+  const [updateChildData, data] = useStateMutation("childData.data");
+
+  const handleUpdateData = () => {
+    updateChildData("Updated Data from Child");
+    console.log("Data updated!");
+  };
+
+  return (
+    <div>
+      <h3>Child Component</h3>
+      <p>Data: {data}</p>
+      <button onClick={handleUpdateData}>Update Data</button>
+    </div>
+  );
+}
+
+
+2. **Cousin Component**: Queries the data and subscribes to its changes.
+
+
+// Cousin.js
+import React from 'react';
+import { useStateQuery, useStateSubscription } from 'quickrenard';
+
+function Cousin() {
+  const data = useStateQuery("childData.data");
+
+  const handleDataChange = () => {
+    console.log("Child data has changed!");
+  };
+
+  useStateSubscription("childData.data", handleDataChange);
+
+  return (
+    <div>
+      <h3>Cousin Component</h3>
+      <p>Data from Child: {data}</p>
+    </div>
+  );
+}
+
+
+With QuickRenard, even if `Child` and `Cousin` aren't directly related, the state update in `Child` will trigger a subscription callback in `Cousin`, allowing seamless state sharing across different parts of your React application.

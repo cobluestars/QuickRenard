@@ -1,9 +1,9 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.js', // 진입점 파일 설정
+  entry: 'dist/QuickRenard.ts', // 진입점 파일을 QuickRenard.ts로 변경
   output: {
-    filename: 'quickrenard.js', // 출력 파일 이름
+    filename: 'QuickRenard.js', // 출력 파일 이름
     path: path.resolve(__dirname, 'dist'), // 출력 경로
     library: 'QuickRenard', // 라이브러리 이름
     libraryTarget: 'umd', // Universal Module Definition

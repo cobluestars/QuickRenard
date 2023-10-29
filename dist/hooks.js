@@ -1,51 +1,64 @@
-/** hooks.ts */
-import { useEffect } from 'react';
-// 상태를 저장하는 중앙 저장소
-const centralState = {};
-const stateSchema = {
-    user: {
-        type: 'object',
-        defaultValue: { name: '', age: 0 },
-    },
-};
-// useStateQuery: 주어진 쿼리에 해당하는 상태를 반환하는 Hook
+import { useEffect, useState } from 'react';
+import { getState, setState, subscribeStateChange } from './stateStore.js';
+
+/**
+ * 주어진 쿼리를 통해 상태를 조회하는 훅
+ * 
+ * @param {string} query - 조회하려는 상태의 이름 또는 경로
+ * @returns 조회된 상태값
+ */
 function useStateQuery(query) {
-    var _a;
-    return centralState[query] || ((_a = stateSchema[query]) === null || _a === void 0 ? void 0 : _a.defaultValue);
-}
-// useStateMutation: 주어진 변이를 실행하는 함수와 상태를 반환하는 Hook
-function useStateMutation(mutation) {
-    var _a;
-    const applyMutation = (newValue) => {
-        const schemaEntry = stateSchema[mutation];
-        if (!schemaEntry) {
-            throw new Error(`Unknown mutation: ${mutation}`);
-        }
-        // 유효성 검사
-        if (schemaEntry.type === 'number') {
-            if (schemaEntry.min !== undefined && newValue < schemaEntry.min) {
-                throw new Error(`Expected a number greater than or equal to ${schemaEntry.min}.`);
-            }
-            if (schemaEntry.max !== undefined && newValue > schemaEntry.max) {
-                throw new Error(`Expected a number less than or equal to ${schemaEntry.max}.`);
-            }
-        }
-        else if (schemaEntry.type === 'string') {
-            if (schemaEntry.minLength !== undefined && newValue.length < schemaEntry.minLength) {
-                throw new Error(`Expected string length greater than or equal to ${schemaEntry.minLength}.`);
-            }
-            if (schemaEntry.maxLength !== undefined && newValue.length > schemaEntry.maxLength) {
-                throw new Error(`Expected string length less than or equal to ${schemaEntry.maxLength}.`);
-            }
-        }
-        centralState[mutation] = newValue;
-    };
-    return [applyMutation, centralState[mutation] || ((_a = stateSchema[mutation]) === null || _a === void 0 ? void 0 : _a.defaultValue)];
-}
-// useStateSubscription: 주어진 상태의 변화를 구독하는 Hook
-function useStateSubscription(stateName, callback) {
+    const [state, setStateLocal] = useState(getState(query));
+
+    // 상태 변화를 감지하여 해당 컴포넌트를 리렌더링
     useEffect(() => {
-        callback();
-    }, [centralState[stateName]]);
+        const unsubscribe = subscribeStateChange(query, (newState) => {
+            setStateLocal(newState);
+        });
+
+        // 구독 해제 (컴포넌트가 언마운트될 때)
+        return () => {
+            unsubscribe();
+        };
+    }, [query]);
+
+    return state;
 }
+
+/**
+ * 주어진 뮤테이션을 통해 상태를 변경하는 훅
+ * 
+ * @param {string} mutation - 변경하려는 상태의 이름 또는 경로
+ * @returns 배열 [상태 변경 함수, 현재 상태값]
+ */
+function useStateMutation(mutation) {
+    const [state, setStateLocal] = useState(getState(mutation));
+
+    // 상태를 변경하면 해당 컴포넌트도 함께 리렌더링
+    const applyMutation = (newValue) => {
+        setState(mutation, newValue);
+        setStateLocal(newValue);
+    };
+
+    return [applyMutation, state];
+}
+
+/**
+ * 상태의 변화를 구독하는 훅
+ * 
+ * @param {string} stateName - 구독하려는 상태의 이름 또는 경로
+ * @param {Function} callback - 상태 변화 시 호출되는 콜백 함수
+ */
+function useStateSubscription(stateName, callback) {
+    // 상태 변화를 감지하면 콜백 함수가 호출
+    useEffect(() => {
+        const unsubscribe = subscribeStateChange(stateName, callback);
+
+        // 구독 해제 (컴포넌트가 언마운트될 때)
+        return () => {
+            unsubscribe();
+        };
+    }, [stateName, callback]);
+}
+
 export { useStateQuery, useStateMutation, useStateSubscription };
