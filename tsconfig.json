@@ -11,14 +11,14 @@
     
     /* 모듈 설정 */
     "module": "esnext",                                  /* ECMAScript 모듈 시스템 사용 설정 */
-    "rootDir": "src",                                    /* 소스 파일이 위치한 루트 디렉토리 경로 */
+    "rootDir": "./src",                                    /* 소스 파일이 위치한 루트 디렉토리 경로 */
     
     /* JavaScript 파일 포함 설정 */
     "allowJs": true,                                      /* 프로젝트 내 JavaScript 파일 포함 허용 설정 */
     
     /* 출력 설정 */
-    "outDir": "dist",                                    /* 컴파일된 파일이 저장될 디렉토리 경로 */
-   
+    "outDir": "./dist",                                    /* 컴파일된 파일이 저장될 디렉토리 경로 */
+
     /* 모듈 상호 운용성 설정 */
     "allowSyntheticDefaultImports": true,                /* 기본 export가 없는 모듈에서 'import x from y' 형식 허용 설정 */
     "esModuleInterop": true,                             /* ES6 모듈 형식과의 상호 운용성 활성화 */
@@ -29,8 +29,11 @@
     "noFallthroughCasesInSwitch": true,                  /* switch문의 case 사이에 실행 흐름 누락 방지 설정 */
     "moduleResolution": "node",                          /* Node.js 스타일의 모듈 해석 설정 */
 
+    "declaration": true,                                 /* 타입 정의 파일을 생성 */
+
     /* 라이브러리 검사 설정 */
-    "skipLibCheck": true                                 /* .d.ts 파일에 대한 타입 검사 생략 설정 */
+    "skipLibCheck": true,                                /* .d.ts 파일에 대한 타입 검사 생략 설정 */
+    
   },
   "include": [  //ts. js. 모두 컴파일에 포함
     "src/**/*.ts",
