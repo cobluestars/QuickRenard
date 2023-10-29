@@ -1,7 +1,7 @@
 {
   "name": "quickrenard",
-  "version": "1.1.0",
-  "description": "\"Quick Renard (QR) - A state management library for React, inspired by FraphQL principles, offering a flexible querying and mutation system.\"",
+  "version": "1.1.1",
+  "description": "\"Quick Renard (QR) - A state management library for React, inspired by GraphQL principles, offering a flexible querying and mutation system.\"",
   
   "main": "dist/QuickRenard.js",
   "types": "dist/QuickRenard.d.ts",  
