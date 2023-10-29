@@ -1,6 +1,6 @@
 {
   "name": "quickrenard",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "\"Quick Renard (QR) - A state management library for React, inspired by FraphQL principles, offering a flexible querying and mutation system.\"",
   "main": "src/stateStore.ts",
   "scripts": {
@@ -8,6 +8,10 @@
     "build": "tsc --build"
   },
   "author": "cw",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cobluestars/QuickRenard.git"
+  },
   "license": "ISC",
   "dependencies": {
     "@types/react": "^18.2.33",
@@ -20,16 +24,13 @@
     "ts-node": "^10.9.1"
   },
   "keywords": [
-    "[",
-    "\"state",
-    "management\"",
-    "\"react\"",
-    "\"GraphQL\"",
-    "\"hooks\"",
-    "\"reactive\"",
-    "\"simple\"",
-    "\"lightweight\"",
-    "\"flexible\"",
-    "]"
+    "state management",
+    "react",
+    "GraphQL",
+    "hooks",
+    "reactive",
+    "simple",
+    "lightweight",
+    "flexible"
   ]
 }
