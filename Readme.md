@@ -1,3 +1,5 @@
+![QuickRenard Logo](https://github.com/cobluestars/QuickRenard/blob/main/public/QuickRenard.png?raw=true)
+
 # QuickRenard
  "\"Quick Renard (QR) - A state management library for React, inspired by FraphQL principles, offering a flexible querying and mutation system.\""
 
