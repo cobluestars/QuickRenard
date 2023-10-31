@@ -21,17 +21,39 @@ function deepSet(obj, path, value) {
 }
 
 // 타입 검증 함수
-function isValidType(value, type) {
+function isValidType(value, schemaEntry) {
+    const type = schemaEntry.type;
+
     switch (type) {
         case 'string':
+            // Enum 검증: 해당 값이 허용된 문자열 집합에 속하는지 검사
+            if (schemaEntry.enum && !schemaEntry.enum.includes(value)) {
+                console.error(`Invalid enum value for state: Expected one of ${schemaEntry.enum.join(', ')}.`);
+                return false;
+            }
             return typeof value === 'string';
         case 'number':
             return typeof value === 'number' && !isNaN(value);
         case 'object':
-            return typeof value === 'object' && value !== null && !Array.isArray(value);
+            if (!value) return false;
+
+            // 객체 속성 검증: 객체의 각 속성의 유형을 검사
+            if (schemaEntry.properties) {
+                for (const key in schemaEntry.properties) {
+                    if (!isValidType(value[key], schemaEntry.properties[key])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         case 'array':
-            return Array.isArray(value);
-        // 추후 다른 타입들에 대한 검증을 추가할 수 있습니다.
+            if (!Array.isArray(value)) return false;
+
+            // 배열 타입 검증: 배열의 각 항목의 유형을 검사
+            if (schemaEntry.items) {
+                return value.every(item => isValidType(item, schemaEntry.items));
+            }
+            return true;
         default:
             return false;
     }
@@ -93,7 +115,7 @@ export function setStateMutation(mutation, newValue) {
 }
 
 export function setState(mutation, newValue) {
-    // 상태 검증 및 저장 부분은 유지
+    // 상태 검증 및 저장 부분
     setStateMutation(mutation, newValue);
 }
 

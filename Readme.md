@@ -3,7 +3,7 @@
 # 🦊quickrenard🦊
 
 GraphQL의 원리를 차용하여
-React의 props나 상태를 관리하는 라이브러리
+React의 상태(State)를 관리하는 라이브러리
 
 ## 🦊Quick Renard🦊를 제작했습니다.
 
@@ -59,10 +59,10 @@ Quick Renard 라이브러리에서는 전역적으로 관리되는 stateStore라
 
 
 ### 요약:
-1. props나 상태를 쿼리화하여 statestore에 저장해서 전역으로 관리하고,
-2. 스키마를 사용해 props와 상태의 구조와 타입을 정의하고,
+1. 상태를 쿼리화하여 statestore에 저장해서 전역으로 관리하고,
+2. 스키마를 사용해 상태의 구조와 타입을 정의하고,
 3. setStateMutation같은 함수에서 유효성 검사를 수행하고 초기 상태를 설정하며, 
-4. setStateSubscription을 이용해 props나 상태를 사용하길 원하는 컴포넌트에서 구독해서 사용
+4. setStateSubscription을 이용해 상태를 사용하길 원하는 컴포넌트에서 구독해서 사용
 
 
 # ❗❗❗ How to use ❗❗❗
