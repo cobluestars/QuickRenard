@@ -5,11 +5,32 @@
 GraphQL의 원리를 차용하여
 React의 상태(State)를 관리하는 라이브러리
 
-## 🦊Quick Renard🦊를 제작했습니다.
+## 🦊Quick Renard를 제작했습니다.🦊
 
 Quick Renard는 전역 상태 저장소를 통해 상태를 중앙에서 관리하면서,
 스키마를 통한 유효성 검사와 구독 기반의 상태 변화 알림 메커니즘을 제공하여, 
 React 애플리케이션의 상태 관리를 간편하고 효과적으로 수행할 수 있게 도와주는 도구입니다.
+
+## 🦊Ver 1.2.0🦊
+
+타입 검증 로직 추가
+
+1. Enum 검증:
+
+- enum 키를 통해 허용된 문자열 집합을 정의할 수 있습니다.
+- 해당 값이 enum에 정의된 문자열 중 하나인지 검사합니다.
+- 예를 들어, 상태가 특정 문자열 값들 중 하나만 가져야 할 경우 사용됩니다.
+
+2. 객체 속성 검증:
+
+- properties 키를 통해 객체의 각 속성에 대한 스키마를 정의할 수 있습니다.
+- 각 속성의 유형을 검사하여 해당 속성이 올바른 유형인지 확인합니다.
+- 객체 내부의 각 속성이 정의된 스키마를 따르는지 검사하기 위해 사용됩니다.
+
+3. 배열 항목 타입 검증:
+
+- 배열의 모든 항목이 해당 스키마를 준수하는지 검사합니다.
+- 배열 내부의 각 항목이 정의된 스키마를 따르는지 검사하기 위해 사용됩니다.
 
 ### 1. 정의 및 설계
 쿼리 기반의 상태 정의: 각 상태를 GraphQL 스키마처럼 정의합니다.
@@ -71,6 +92,27 @@ Quick Renard 라이브러리에서는 전역적으로 관리되는 stateStore라
 
 QuickRenard(quickrenard) is a lightweight state management solution for React applications. By providing clear paths for data querying, mutation, and subscriptions, QuickRenard streamlines the state-sharing process between components, even if they aren't directly related in the component tree.
 
+## 🦊Ver 1.2.0🦊
+
+Added type validation logic.
+
+1. Enum validation:
+
+- You can define an allowed set of string values through the enum key.
+- It checks if the value is one of the strings defined in the enum.
+- This is used when the state should only have one of specific string values.
+
+2. Object property validation:
+
+- You can define a schema for each property of the object using the properties key.
+- It verifies the type of each property to ensure it's of the correct type.
+- It's used to check if each property within the object adheres to the defined schema.
+
+3. Array item type validation:
+
+- It checks if all items in the array adhere to the specified schema.
+- This is used to verify if each item inside the array follows the defined schema.
+
 ## Setup and Initialization
 
 To start using quickrenard, you first need to define a schema for your state and then initialize the store.
@@ -81,14 +123,11 @@ Your state is structured based on a schema. This schema outlines the shape, type
 
 ```javascript
 // stateSchema.js
-export const childStateSchema = {
-  type: "object",
-  properties: {
-    data: {
-      type: "string",
-      default: "Initial Data from Child"
+export const stateSchema = {
+    'childData.data': {
+        type: 'string',
+        defaultValue: 'initialValue'
     }
-  }
 };
 ```
 
@@ -98,11 +137,9 @@ Once you have your schema in place, initialize the state store with it. This set
 ```javascript
 // stateStore.js
 import { initializeStore } from 'quickrenard';
-import { childStateSchema } from './stateSchema';
+import { stateSchema } from './stateSchema';
 
-initializeStore({
-  childData: childStateSchema.properties
-});
+initializeStore(stateSchema);
 ```
 
 ### 3. Using quickrenard in Components

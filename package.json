@@ -1,11 +1,9 @@
 {
   "name": "quickrenard",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "description": "\"Quick Renard (QR) - A state management library for React, inspired by GraphQL principles, offering a flexible querying and mutation system.\"",
-  
   "main": "dist/QuickRenard.js",
-  "types": "dist/QuickRenard.d.ts",  
-
+  "types": "dist/QuickRenard.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode production",
@@ -14,22 +12,20 @@
     "compile:esm": "tsc --module ES6",
     "compile:cjs": "tsc --module CommonJS"
   },
-
   "author": "cw",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cobluestars/QuickRenard.git"
   },
-  
   "license": "ISC",
   "dependencies": {
     "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.2.2"
   },
-  
   "devDependencies": {
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
@@ -42,7 +38,6 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
-  
   "keywords": [
     "front end",
     "state management",
