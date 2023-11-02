@@ -42,9 +42,9 @@
 
 ## 🦊Ver 2.0.0🦊
 
-<label> 함수 전역 관리 기능 functionStore 추가 </label>
+<label> 함수 전역 관리소 functionStore 추가 </label>
 
-### 1. 관리할 수 있는 대표적인 함수 유형 목록:
+### 1. 관리할 수 있는 대표적인 함수 유형:
 
  - 순수 함수: 동일한 인자에 대해 항상 동일한 결과를 반환하고, 외부 상태를 변경하지 않는 함수입니다.
  
@@ -52,7 +52,7 @@
  
  - 헬퍼 함수: 반복적으로 사용되는 로직을 추상화한 함수입니다 (예: API 요청).
  
-### 2. 이 함수 저장소는 위의 유형의 함수를 효과적으로 관리할 수 있으나, 다음의 주의가 필요합니다:
+### 2. 위와 같은 함수들을 관리할 수 있으나, 주의가 필요합니다:
  
  - 사이드 이펙트: 함수가 외부 시스템의 상태에 영향을 주거나 그로부터 영향을 받는 경우,
   (예시: 데이터베이스에 접근하거나 외부 API를 호출하는 함수) 예측하지 못한 결과를 초래할 수 있습니다.
@@ -63,7 +63,7 @@
 
  - 동시성 제어: 여러 구독자가 동일한 함수의 결과를 구독할 때 발생하는 동시성 이슈를 관리해야 합니다.
 
-### functionStore를 사용하려면, 아래에 있는 !!! How to use !!! 를 참조하세요.
+### functionStore를 사용하려면, 아래의 !!! How to use !!! 를 참조하세요.
 
 <br />
 <hr />
@@ -303,7 +303,8 @@ With quickrenard, even if Child and Cousin aren't directly related, the state up
 <hr />
 <br />
 
-# 🦊 QuickRenard 🦊 (Ver 2.0.0): State & Function Management in React
+# 🦊 QuickRenard 🦊 
+# Ver 2.0.0: State & Function Management in React
 
 QuickRenard provides a streamlined way to manage both state and functions globally in your React application. With the introduction of functionStore in version 2.0.0, QuickRenard not only allows you to manage state efficiently but also to register and invoke functions across your component tree, promoting reusability and separation of concerns.
 
