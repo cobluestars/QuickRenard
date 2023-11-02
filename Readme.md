@@ -303,41 +303,52 @@ With quickrenard, even if Child and Cousin aren't directly related, the state up
 <hr />
 <br />
 
-# 🦊 QuickRenard 🦊 (Ver 2.0.0):  State & Function Management in React
+# 🦊 QuickRenard 🦊 (Ver 2.0.0): State & Function Management in React
 
 QuickRenard provides a streamlined way to manage both state and functions globally in your React application. With the introduction of functionStore in version 2.0.0, QuickRenard not only allows you to manage state efficiently but also to register and invoke functions across your component tree, promoting reusability and separation of concerns.
 
-## 🦊 Version 2.0.0 🦊: Introducing FunctionStore
 <br />
+<hr />
+<br />
+
+## 🦊 Version 2.0.0 🦊: Introducing FunctionStore
+
 Alongside state management, QuickRenard now brings a powerful functionStore utility, enabling you to:
 
 - Register and manage globally accessible functions.
 - Invoke registered functions from any component.
+- Subscribe to and unsubscribe from function calls to handle side effects or cleanup.
 - Maintain cleaner code by abstracting common logic into functions.
 - Avoid prop drilling for functions, just like state.
 
 ## Setup and Initialization
 
-- To leverage the full capabilities of QuickRenard, follow these steps to set up your function stores:
-
-<br />
+To leverage the full capabilities of QuickRenard, follow these steps to set up your function stores:
 
 ### Initialize Function Store (New in v2.0.0):
 
 ```javascript
 // functionStore.js
-import { registerFunction, callFunction } from './functionStore';
+import { registerFunction, callFunction, subscribeFunction, unsubscribeFunction } from './functionStore';
 
 // Register a global function
 registerFunction('globalLogger', (message) => console.log(message));
 
 // Later in your app, call the registered function
 callFunction('globalLogger', 'This is a global log message');
+
+// Subscribe to a function to listen for its invocations
+const unsubscribe = subscribeFunction('globalLogger', (message) => {
+  // Handle the message
+  console.log('Subscription message:', message);
+});
+
+// Unsubscribe when you no longer need to listen
+unsubscribe();
 ```
 
-## Using QuickRenard in Components
-
-- QuickRenard provides hooks for querying, mutating state, and subscribing to state changes. Now with the function store, you can also register and call functions in your components.
+## 🦊Using QuickRenard in Components🦊
+- QuickRenard provides hooks for querying, mutating state, and subscribing to state changes. Now with the function store, you can also register, call, subscribe, and unsubscribe functions in your components.
 
 1. Registering Functions (🦊New in v2.0.0):
 
@@ -351,6 +362,18 @@ registerFunction('uniqueFunctionName', yourFunctionLogic);
 callFunction('uniqueFunctionName', ...args);
 ```
 
+3. Subscribing to Functions (🦊New in v2.0.0):
+
+```javascript
+const unsubscribe = subscribeFunction('uniqueFunctionName', callbackFunction);
+```
+
+4. Unsubscribing from Functions (🦊New in v2.0.0):
+
+```javascript
+unsubscribe();
+```
+
 ## 🦊Example🦊: Sharing State and Functions Between Distant Components
 
 -With QuickRenard, components like Child and Cousin can share state and invoke functions without being directly related in the component tree.
@@ -360,6 +383,7 @@ callFunction('uniqueFunctionName', ...args);
 ```javascript
 // functionStore.js
 const functionStore = {};
+const subscribers = {};
 
 export const registerFunction = (name, fn) => {
   functionStore[name] = fn;
@@ -368,9 +392,27 @@ export const registerFunction = (name, fn) => {
 export const callFunction = (name, ...args) => {
   const fn = functionStore[name];
   if (fn) {
-    return fn(...args);
+    const result = fn(...args);
+    // Notify all subscribers after function call
+    subscribers[name]?.forEach(subscriber => subscriber(result));
+    return result;
   }
   throw new Error(`Function "${name}" is not registered.`);
+};
+
+// Subscribe to a function to listen for its calls
+export const subscribeFunction = (name, callback) => {
+  if (!subscribers[name]) {
+    subscribers[name] = [];
+  }
+  subscribers[name].push(callback);
+  // Return a function to unsubscribe
+  return () => unsubscribeFunction(name, callback);
+};
+
+// Unsubscribe from a function to stop listening for its calls
+export const unsubscribeFunction = (name, callback) => {
+  subscribers[name] = subscribers[name]?.filter(sub => sub !== callback);
 };
 ```
 
@@ -394,6 +436,8 @@ function Child() {
   // Registering a new function called 'childFunction'
   const childFunction = (message) => {
     console.log("Message from Child Function:", message);
+    // Return the message for the subscribers
+    return message;
   };
   
   registerFunction('childFunction', childFunction);
@@ -415,9 +459,9 @@ This component queries the data, subscribes to its changes, and invokes a functi
 
 ```javascript
 // Cousin.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStateQuery, useStateSubscription } from 'quickrenard';
-import { callFunction } from './functionStore'; // Import the callFunction
+import { callFunction, subscribeFunction } from './functionStore';
 
 function Cousin() {
   const data = useStateQuery("childData.data");
@@ -431,6 +475,18 @@ function Cousin() {
       console.error(error.message);
     }
   };
+
+  // Subscribe to the childFunction to listen for calls from Child
+  useEffect(() => {
+    const unsubscribe = subscribeFunction('childFunction', (message) => {
+      console.log("Received message from childFunction:", message);
+    });
+
+    return () => {
+      // Clean up the subscription on unmount
+      unsubscribe();
+    };
+  }, []);
 
   useStateSubscription("childData.data", handleDataChange);
 
