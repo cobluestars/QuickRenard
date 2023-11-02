@@ -12,3 +12,10 @@ export {
     useStateMutation, 
     useStateSubscription 
 } from './hooks';
+
+// functionStore.js에서 export된 함수들을 재-export
+export { 
+    registerFunction, 
+    callFunction, 
+    subscribeFunction 
+} from './functionStore';

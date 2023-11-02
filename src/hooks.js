@@ -1,6 +1,5 @@
-/**hooks.js */
-import { useEffect } from 'react';
-import { getState, setState, subscribeStateChange } from './stateStore.js'; // stateStore에서 함수를 가져옴.
+import { useEffect, useState } from 'react';
+import { getState, setState, subscribeStateChange } from './stateStore.js';
 
 /**
  * 주어진 쿼리를 통해 상태를 조회하는 훅
@@ -9,7 +8,21 @@ import { getState, setState, subscribeStateChange } from './stateStore.js'; // s
  * @returns 조회된 상태값
  */
 function useStateQuery(query) {
-    return getState(query); // stateStore에서 상태 조회
+    const [state, setStateLocal] = useState(getState(query));
+
+    // 상태 변화를 감지하여 해당 컴포넌트를 리렌더링
+    useEffect(() => {
+        const unsubscribe = subscribeStateChange(query, (newState) => {
+            setStateLocal(newState);
+        });
+
+        // 구독 해제 (컴포넌트가 언마운트될 때)
+        return () => {
+            unsubscribe();
+        };
+    }, [query]);
+
+    return state;
 }
 
 /**
@@ -19,11 +32,15 @@ function useStateQuery(query) {
  * @returns 배열 [상태 변경 함수, 현재 상태값]
  */
 function useStateMutation(mutation) {
+    const [state, setStateLocal] = useState(getState(mutation));
+
+    // 상태를 변경하면 해당 컴포넌트도 함께 리렌더링
     const applyMutation = (newValue) => {
-        setState(mutation, newValue); // stateStore에서 상태 변경
+        setState(mutation, newValue);
+        setStateLocal(newValue);
     };
 
-    return [applyMutation, getState(mutation)];
+    return [applyMutation, state];
 }
 
 /**
@@ -33,11 +50,14 @@ function useStateMutation(mutation) {
  * @param {Function} callback - 상태 변화 시 호출되는 콜백 함수
  */
 function useStateSubscription(stateName, callback) {
+    // 상태 변화를 감지하면 콜백 함수가 호출
     useEffect(() => {
-        const unsubscribe = subscribeStateChange(stateName, callback); // stateStore에서 상태 변화 구독
+        const unsubscribe = subscribeStateChange(stateName, callback);
+
+        // 구독 해제 (컴포넌트가 언마운트될 때)
         return () => {
-            unsubscribe(); // 구독 취소
-        }
+            unsubscribe();
+        };
     }, [stateName, callback]);
 }
 
