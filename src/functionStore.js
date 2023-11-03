@@ -1,4 +1,4 @@
-// functionStore.js
+// ./src/functionStore.js
 
 // 함수를 저장하는 저장소
 const functionStore = {};
@@ -89,4 +89,4 @@ function notifySubscribers(name, data) {
 }
 
 // 외부로 공개할 메서드들
-export { registerFunction, callFunction, subscribeFunction };
+module.exports = { registerFunction, callFunction, subscribeFunction };

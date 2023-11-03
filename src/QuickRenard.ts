@@ -1,21 +1,22 @@
+/**./src/QuickRenard.ts */
+
 // stateStore.ts에서 export된 함수들을 재-export
 export { 
     initializeStore, 
-    getState, 
-    setStateMutation, 
+    getState,
     subscribeStateChange 
-} from './stateStore.d';
+} from './stateStore';
 
 // hooks.ts에서 export된 함수들을 재-export
 export { 
     useStateQuery, 
     useStateMutation, 
     useStateSubscription 
-} from './hooks.d';
+} from './hooks';
 
-// functionStore.js에서 export된 함수들을 재-export
+// functionStore.ts에서 export된 함수들을 재-export
 export { 
     registerFunction, 
     callFunction, 
     subscribeFunction 
-} from './functionStore.d';
+} from './functionStore';
