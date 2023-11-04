@@ -408,7 +408,7 @@ function Cousin() {
     console.log("Child data has changed!");
     // Invoke the function registered by Child
     try {
-      const response = callFunction('childFunction', 'Hi from Cousin');
+      const response = callFunction('childFunction', 'Hello World! - from Cousin');
       console.log('Response from Child:', response);
     } catch (error) {
       console.error(error.message);

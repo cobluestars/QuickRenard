@@ -1,7 +1,15 @@
 const path = require('path');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = {
-  entry: 'dist/QuickRenard.ts', // 진입점 파일을 QuickRenard.ts로 변경
+  plugins: [
+    new LodashModuleReplacementPlugin
+    ({
+      'collections': true,
+      'paths': true
+    })
+  ],
+  entry: './src/QuickRenard.ts', // 진입점 파일을 QuickRenard.ts로 변경
   output: {
     filename: 'QuickRenard.js', // 출력 파일 이름
     path: path.resolve(__dirname, 'dist'), // 출력 경로

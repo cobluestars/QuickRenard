@@ -4,6 +4,7 @@
 export { 
     initializeStore, 
     getState,
+    setStateMutation, 
     subscribeStateChange 
 } from './stateStore';
 
