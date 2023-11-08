@@ -44,6 +44,8 @@
 
 ## 함수 전역 관리소 functionStore 추가
 
+<br />
+
 ### 1. 관리할 수 있는 대표적인 함수 유형:
 
 - 순수 함수: 동일한 인자에 대해 항상 동일한 결과를 반환하고, 외부 상태를 변경하지 않는 함수입니다.
@@ -66,6 +68,28 @@
 - p.s: QuickRenard 2.1.0 버전에서는 함수 호출에 대응하는 구독과 구독 취소 과정이 라이브러리 내부적으로 자동으로 관리되도록 개선하였습니다. 간단히 말해, QuickRenard가 구독과 구독 취소의 세세한 관리를 자동화함으로써, 개발자는 함수 등록 및 호출에 집중할 수 있으며, 더 안정적이고 유지보수가 쉬운 코드를 작성할 수 있을 것입니다. GraphQL 컨셉질을 함수 전역 관리에도 적용해보려다 도무지 감당하지 못해서 이런 결정을 내린 건 절대로 아닙니다.💀
 
 ### functionStore를 사용하려면, 아래의 !!! How to use !!! 를 참조하세요.
+
+<br />
+<hr />
+<br />
+
+## 🦊Ver 2.3.0🦊
+
+## 상태 캐싱 로직 추가:
+
+<br />
+
+### 성능 최적화를 위한 새로운 기능:
+1. 상태 캐싱을 통해, 자주 접근하는 상태에 대한 신속한 검색이 가능합니다. 라이브러리 사용 시, 성능이 전반적으로 개선될 것입니다.
+
+2. 이전에 요청된 상태 값을 캐시에 저장합니다. 같은 상태를 다시 요청할 때 신속한 응답을 받을 수 있습니다. 복잡한 계산 혹은 데이터베이스 쿼리가 필요한 상태의 경우, 특히 이 기능은 유용할 것입니다.
+
+3. 네트워크 지연, 서버 과부하를 예방하는 데에 효과적입니다. 원격 데이터를 상태로 관리하는 경우, 캐싱은 네트워크 요청 수를 줄임으로써, 데이터 전송을 효율적으로 수행할 수 있습니다.
+
+### 캐싱 관련 주의사항:
+- 캐시는 메모리 관리를 위해 15분 뒤에 만료됩니다.
+
+### 업데이트를 통해 QuickRenard는 애플리케이션의 성능을 개선하고, 보다 효율적으로 상태 관리를 할 수 있도록 지원합니다. Ver 2.3.0 업데이트는 특히 대규모 애플리케이션 및 데이터 집약적 작업에 중점을 두고 진행했습니다.
 
 <br />
 <hr />
@@ -128,6 +152,24 @@
 ## : A Simple State Management in React
 
 QuickRenard(quickrenard) is a lightweight state management solution for React applications. By providing clear paths for data querying, mutation, and subscriptions, QuickRenard streamlines the state-sharing process between components, even if they aren't directly related in the component tree.
+
+<br />
+<br />
+
+## 🦊Ver 2.3.0🦊
+
+### Added State Caching Logic:
+
+1. New Features for Performance Optimization: State caching enables swift retrieval of frequently accessed states, leading to overall performance improvements when using the library.
+
+2. Previously requested state values are stored in the cache. This allows for quick responses when the same state is requested again. This feature is especially beneficial for states that require complex calculations or database queries.
+
+3. It is effective in preventing network delays and server overloads. When managing remote data as state, caching can reduce the number of network requests, making data transfer more efficient.
+
+### Cautions Related to Caching:
+- To manage memory, the cache expires after 15 minutes.
+
+### Through this update, QuickRenard aims to enhance application performance and enable more efficient state management. The Ver 2.3.0 update has been focused particularly on large-scale applications and data-intensive tasks.
 
 <br />
 <br />
