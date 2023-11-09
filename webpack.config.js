@@ -2,6 +2,7 @@ const path = require('path');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = {
+  mode: 'development', // 'production' 모드로 변경하여 최적화 가능
   plugins: [
     new LodashModuleReplacementPlugin
     ({
