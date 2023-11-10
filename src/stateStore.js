@@ -92,26 +92,26 @@ function isValidType(value, schemaEntry) {
     return true; // 모든 검증이 통과하면 true 반환
 }    
 
-// 상태 저장소와 구독자 목록을 초기화하는 함수
-function initializeState(schema) {
-    Object.keys(schema).forEach((key) => {
-      deepSet(stateStore, key, schema[key].defaultValue);
-      subscribers[key] = []; // 각 상태 항목에 대한 구독자 목록 초기화
-    });
-}
-  
-// 상태 저장소와 스키마를 초기화하는 함수
-export function initializeStore(schema) {
-    stateSchema = schema; // 스키마 설정
-    initializeState(schema); // 저장소 초기화
-    // 초기화 로그 출력
-    console.log('Setting up subscribers for:', Object.keys(subscribers));
-    console.log('Initialized state store:', stateStore);
-    console.log('Initialized state schema:', stateSchema);
-}
+/** 캐시 객체를 외부에 노출하는 함수 */
+
+export function getCacheObject() {
+    return stateCache;
+} 
+
+/** 주의: 위 함수는 라이브러리의 내부 상태를 외부에 노출합니다.
+ * - 위 함수는 개발 및 디버깅 목적으로 사용해야 합니다.
+ * - 외부에서 캐시 객체를 변경하면 라이브러리에 예기치 않은 문제가 발생할 수 있습니다.
+ * - 캐시 객체를 직접 수정하는 대신, 라이브러리가 제공하는 API를 통해 상태를 변경해 주십시오.
+ * - 캐시 객체의 내용을 읽고 모니터링하는 것은 가능하지만, 이를 변경하는 것은 권장하지 않습니다.
+ */
 
 // 캐시 만료 시간을 15분으로 설정
-const CACHE_EXPIRATION_TIME = 900000; // milliseconds
+let CACHE_EXPIRATION_TIME = 900000; // milliseconds
+
+// 캐시 만료 시간을 설정하는 함수 (milliseconds 단위)
+export function setCacheExpirationTime(milliseconds) {
+    CACHE_EXPIRATION_TIME = milliseconds;
+ }
 
 // 캐시된 상태의 만료 시간을 추적하는 객체
 const cacheExpirationRecords = {};
@@ -147,24 +147,47 @@ export function getState(query) {
   return value;
 }
 
+// 상태 저장소와 구독자 목록을 초기화하는 함수
+function initializeState(schema) {
+    Object.keys(schema).forEach((key) => {
+      deepSet(stateStore, key, schema[key].defaultValue);
+      subscribers[key] = []; // 각 상태 항목에 대한 구독자 목록 초기화
+    });
+}
+  
+// 상태 저장소와 스키마를 초기화하는 함수
+export function initializeStore(schema, options = {}) {
+    stateSchema = schema; // 스키마 설정
+    initializeState(schema); // 저장소 초기화
 
-  export function setStateMutation(mutation, newValue) {
+    // 사용자가 캐시 만료 시간을 설정한 경우 적용
+    if (options.cacheExpirationTime) {
+        setCacheExpirationTime(options.cacheExpirationTime);
+    }
+
+    // 초기화 로그 출력
+    // console.log('Setting up subscribers for:', Object.keys(subscribers));
+    // console.log('Initialized state store:', stateStore);
+    // console.log('Initialized state schema:', stateSchema);
+}
+
+export function setStateMutation(mutation, newValue) {
     // 스키마 항목 가져오기 - stateSchema에서 직접 가져옴
     const schemaEntry = stateSchema[mutation];
     console.log(`Mutation '${mutation}' schema entry:`, schemaEntry);
-    
+
     // 스키마 항목이 없거나, 타입 정보가 없는 경우 에러 처리
     if (!schemaEntry || typeof schemaEntry.type === 'undefined') {
         console.error(`스키마 항목을 찾을 수 없거나 타입 정보가 없습니다: ${mutation}. 스키마 정의를 확인하세요.`);
         return;
     }
-       
+        
     // 타입 검증
     if (!isValidType(newValue, schemaEntry)) {
         console.error(`잘못된 타입의 상태입니다: ${mutation}. 기대 타입: ${schemaEntry.type}, 받은 타입: ${typeof newValue}.`);
         return;
     }
-    
+
     // 값 범위 검사 (숫자 타입)
     if (schemaEntry.type === 'number') {
         if (schemaEntry.min !== undefined && newValue < schemaEntry.min) {
@@ -176,7 +199,7 @@ export function getState(query) {
             return;
         }
     }
-    
+
     // 문자열 길이 검사
     if (schemaEntry.type === 'string') {
         if (schemaEntry.minLength !== undefined && newValue.length < schemaEntry.minLength) {

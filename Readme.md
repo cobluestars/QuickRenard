@@ -73,7 +73,7 @@
 <hr />
 <br />
 
-## 🦊Ver 2.3.0🦊
+## 🦊Ver 2.3.0 - Ver 2.5.0🦊
 
 ## 상태 캐싱 로직 추가:
 
@@ -87,7 +87,9 @@
 3. 네트워크 지연, 서버 과부하를 예방하는 데에 효과적입니다. 원격 데이터를 상태로 관리하는 경우, 캐싱은 네트워크 요청 수를 줄임으로써, 데이터 전송을 효율적으로 수행할 수 있습니다.
 
 ### 캐싱 관련 주의사항:
-- 캐시는 메모리 관리를 위해 15분 뒤에 만료됩니다.
+1. 캐시는 메모리 관리를 위해, 디폴트 값으로 15분 뒤에 만료됩니다.
+
+2. Ver 2.5.0부터 캐시 만료 시간을 임의로 조정할 수 있습니다. 방법 및 주의사항은 ❗❗❗ How to use ❗❗❗를 참조하세요.
 
 ### 업데이트를 통해 QuickRenard는 애플리케이션의 성능을 개선하고, 보다 효율적으로 상태 관리를 할 수 있도록 지원합니다. Ver 2.3.0 업데이트는 특히 대규모 애플리케이션 및 데이터 집약적 작업에 중점을 두고 진행했습니다.
 
@@ -156,7 +158,7 @@ QuickRenard(quickrenard) is a lightweight state management solution for React ap
 <br />
 <br />
 
-## 🦊Ver 2.3.0🦊
+## 🦊Ver 2.3.0 - Ver 2.5.0🦊
 
 ### Added State Caching Logic:
 
@@ -167,7 +169,60 @@ QuickRenard(quickrenard) is a lightweight state management solution for React ap
 3. It is effective in preventing network delays and server overloads. When managing remote data as state, caching can reduce the number of network requests, making data transfer more efficient.
 
 ### Cautions Related to Caching:
-- To manage memory, the cache expires after 15 minutes.
+
+1. To manage memory, the cache expires after 15 minutes(default).
+
+2. From Ver 2.5.0 onwards, you can adjust the cache expiration time at your discretion. For the method and precautions, please refer to the following.
+
+3. Caution: The getCacheObject function exposes the library's internal state to the outside. This function should be used for development and debugging purposes only. Modifying the cache object externally can lead to unexpected issues in the library. Instead of directly altering the cache object, please use the APIs provided by the library to change the state. While it is possible to read and monitor the contents of the cache object, altering it is not recommended.
+
+```javascript
+// Example of using quickrenard
+import { initializeStore, getCacheObject, subscribeStateChange } from 'quickrenard';
+import { stateSchema } from './stateSchema';
+
+// Example: Set cache expiration time to 30 minutes
+initializeStore(stateSchema, { cacheExpirationTime: 1800000 });
+
+/** 🦊Optional Usage Example🦊: Function for cache expiration countdown */
+
+// Function for cache expiration countdown
+function cacheExpirationCountdown() {
+  // Get the current time
+  const now = performance.now();
+
+  // Access the cache object
+  const cache = getCacheObject();
+
+  console.clear();
+  console.log("Cache Expiration Countdown:");
+
+  // Iterate through each cache key and display the remaining time
+  Object.keys(cache).forEach(key => {
+    const record = cache[key];
+    if (record) {
+      const remainingTime = record.expirationTime - now;
+      if (remainingTime > 0) {
+        console.log(`${key}: ${Math.ceil(remainingTime / 1000)} seconds remaining`);
+      } else {
+        console.log(`${key}: Expired`);
+      }
+    }
+  });
+}
+
+// 🦊Optionally, run the countdown periodically🦊
+setInterval(cacheExpirationCountdown, 1000);
+
+/**  🦊Note🦊: This is an optional feature for monitoring cache expiration in the console.
+     Use it primarily for development and debugging purposes. It should be used
+     cautiously in a production environment as it can impact performance. */
+
+// Example of subscribing to state changes
+subscribeStateChange("someStateKey", (newState) => {
+  console.log("State changed:", newState);
+});
+```
 
 ### Through this update, QuickRenard aims to enhance application performance and enable more efficient state management. The Ver 2.3.0 update has been focused particularly on large-scale applications and data-intensive tasks.
 

@@ -20,4 +20,5 @@ export declare function initializeStore(schema: StateSchema): void;
 export declare function getState(query: string): any;
 export declare function setStateMutation(mutation: string, newValue: any): void;
 export declare function subscribeStateChange(stateName: string, callback: (newState: any) => void): () => void;
+export declare function getCacheObject(): Record<string, any>;
 export {};
