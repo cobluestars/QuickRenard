@@ -97,6 +97,20 @@
 <hr />
 <br />
 
+## 🦊Ver 2.6.0🦊
+
+- 상태 관리 시스템이 더욱 강력해졌습니다. 이제 상태 간의 복잡한 종속성을 그래프 탐색 알고리즘으로 효과적으로 관리할 수 있습니다. DFS(깊이 우선 탐색)와 BFS(너비 우선 탐색) 알고리즘을 활용하여, 상태의 업데이트가 다른 상태에 미치는 영향을 효과적으로 처리합니다.
+
+1. DFS(깊이 우선 탐색): 깊게 연결된 상태 간의 종속성을 탐색합니다. 이 방식은 상태 간에 깊은 연결이 있는 경우에 적합합니다.
+2. BFS(너비 우선 탐색): 넓은 범위의 상태 간의 종속성을 탐색합니다. 이 방식은 더 넓은 범위의 상태 간 영향을 관리할 때 유용합니다.
+3. 사용자는 상황에 따라 DFS 또는 BFS를 선택하여 사용할 수 있습니다. 물론, 사용하지 않을 수도 있지요. 이를 통해 상태 관리가 더욱 유연하고 효율적으로 이루어집니다.
+
+### DFS 또는 BFS 관련 설정을 사용하려면, 아래의 !!! How to use !!! 를 참조하세요. (추후 추가될 예정)
+
+<br />
+<hr />
+<br />
+
 ### 1. 정의 및 설계
 1. 쿼리 기반의 상태 정의: 각 상태를 GraphQL 스키마처럼 정의합니다. 예를 들어, 상태의 타입, 초기 값, 의존성 등을 명시적으로 표현합니다.
 2. 쿼리 및 변이 작성: 사용자가 상태를 조회하거나 수정할 수 있도록 쿼리와 변이를 제공합니다.
@@ -156,128 +170,6 @@
 QuickRenard(quickrenard) is a lightweight state management solution for React applications. By providing clear paths for data querying, mutation, and subscriptions, QuickRenard streamlines the state-sharing process between components, even if they aren't directly related in the component tree.
 
 <br />
-<br />
-
-## 🦊Ver 2.3.0 - Ver 2.5.0🦊
-
-### Added State Caching Logic:
-
-1. New Features for Performance Optimization: State caching enables swift retrieval of frequently accessed states, leading to overall performance improvements when using the library.
-
-2. Previously requested state values are stored in the cache. This allows for quick responses when the same state is requested again. This feature is especially beneficial for states that require complex calculations or database queries.
-
-3. It is effective in preventing network delays and server overloads. When managing remote data as state, caching can reduce the number of network requests, making data transfer more efficient.
-
-### Cautions Related to Caching:
-
-1. To manage memory, the cache expires after 15 minutes(default).
-
-2. From Ver 2.5.0 onwards, you can adjust the cache expiration time at your discretion. For the method and precautions, please refer to the following.
-
-3. Caution: The getCacheObject function exposes the library's internal state to the outside. This function should be used for development and debugging purposes only. Modifying the cache object externally can lead to unexpected issues in the library. Instead of directly altering the cache object, please use the APIs provided by the library to change the state. While it is possible to read and monitor the contents of the cache object, altering it is not recommended.
-
-```javascript
-// Example of using quickrenard
-import { initializeStore, getCacheObject, subscribeStateChange } from 'quickrenard';
-import { stateSchema } from './stateSchema';
-
-// Example: Set cache expiration time to 30 minutes
-initializeStore(stateSchema, { cacheExpirationTime: 1800000 });
-
-/** 🦊Optional Usage Example🦊: Function for cache expiration countdown */
-
-// Function for cache expiration countdown
-function cacheExpirationCountdown() {
-  // Get the current time
-  const now = performance.now();
-
-  // Access the cache object
-  const cache = getCacheObject();
-
-  console.clear();
-  console.log("Cache Expiration Countdown:");
-
-  // Iterate through each cache key and display the remaining time
-  Object.keys(cache).forEach(key => {
-    const record = cache[key];
-    if (record) {
-      const remainingTime = record.expirationTime - now;
-      if (remainingTime > 0) {
-        console.log(`${key}: ${Math.ceil(remainingTime / 1000)} seconds remaining`);
-      } else {
-        console.log(`${key}: Expired`);
-      }
-    }
-  });
-}
-
-// 🦊Optionally, run the countdown periodically🦊
-setInterval(cacheExpirationCountdown, 1000);
-
-/**  🦊Note🦊: This is an optional feature for monitoring cache expiration in the console.
-     Use it primarily for development and debugging purposes. It should be used
-     cautiously in a production environment as it can impact performance. */
-
-// Example of subscribing to state changes
-subscribeStateChange("someStateKey", (newState) => {
-  console.log("State changed:", newState);
-});
-```
-
-### Through this update, QuickRenard aims to enhance application performance and enable more efficient state management. The Ver 2.3.0 update has been focused particularly on large-scale applications and data-intensive tasks.
-
-<br />
-<br />
-
-## 🦊Version 2.0.0🦊
-
-### Global function management feature 'functionStore' added
-
-### 1. List of representative function types that can be managed:
-
-- Pure Functions: Functions that always return the same result for the same arguments without changing external state.
-
-- Utility Functions: Functions that provide reusable functionalities such as string processing, date calculations, number formatting, etc.
-
-- Helper Functions: Functions that abstract commonly used logic throughout the application (e.g., API requests).
-
-### 2. While this function store can effectively manage the above types of functions, the following precautions are necessary:
-
-- Side Effects: Functions that affect or are affected by the state of external systems,
- (such as accessing a database or calling external APIs) can lead to unpredictable results.
-
-- State Dependency: Functions that depend on internal state may have results that are affected by changes to that state.
-
-- Scope and Closures: Functions that use variables from a specific scope need to have these dependencies managed.
-
-- Concurrency Control: Issues of concurrency that arise when multiple subscribers subscribe to the results of the same function must be managed.
-
-<br />
-<br />
-
-## 🦊Ver 1.2.0🦊
-
-### Added type validation logic.
-
-1. Enum validation:
-
-- You can define an allowed set of string values through the enum key.
-- It checks if the value is one of the strings defined in the enum.
-- This is used when the state should only have one of specific string values.
-
-2. Object property validation:
-
-- You can define a schema for each property of the object using the properties key.
-- It verifies the type of each property to ensure it's of the correct type.
-- It's used to check if each property within the object adheres to the defined schema.
-
-3. Array item type validation:
-
-- It checks if all items in the array adhere to the specified schema.
-- This is used to verify if each item inside the array follows the defined schema.
-
-<br />
-<hr />
 <br />
 
 ## Setup and Initialization
@@ -393,11 +285,59 @@ function Cousin() {
 With quickrenard, even if Child and Cousin aren't directly related, the state update in Child will trigger a subscription callback in Cousin, allowing seamless state sharing across different parts of your React application.
 
 <br />
-<hr />
 <br />
 
-# 🦊 QuickRenard 🦊 
-## Ver 2.1.0: State & Function Management in React
+## 🦊Ver 1.2.0🦊
+
+### Added type validation logic.
+
+1. Enum validation:
+
+- You can define an allowed set of string values through the enum key.
+- It checks if the value is one of the strings defined in the enum.
+- This is used when the state should only have one of specific string values.
+
+2. Object property validation:
+
+- You can define a schema for each property of the object using the properties key.
+- It verifies the type of each property to ensure it's of the correct type.
+- It's used to check if each property within the object adheres to the defined schema.
+
+3. Array item type validation:
+
+- It checks if all items in the array adhere to the specified schema.
+- This is used to verify if each item inside the array follows the defined schema.
+
+<br />
+<br />
+
+## 🦊Version 2.0.0🦊
+
+### Global function management feature 'functionStore' added
+
+### 1. List of representative function types that can be managed:
+
+- Pure Functions: Functions that always return the same result for the same arguments without changing external state.
+
+- Utility Functions: Functions that provide reusable functionalities such as string processing, date calculations, number formatting, etc.
+
+- Helper Functions: Functions that abstract commonly used logic throughout the application (e.g., API requests).
+
+### 2. While this function store can effectively manage the above types of functions, the following precautions are necessary:
+
+- Side Effects: Functions that affect or are affected by the state of external systems,
+ (such as accessing a database or calling external APIs) can lead to unpredictable results.
+
+- State Dependency: Functions that depend on internal state may have results that are affected by changes to that state.
+
+- Scope and Closures: Functions that use variables from a specific scope need to have these dependencies managed.
+
+- Concurrency Control: Issues of concurrency that arise when multiple subscribers subscribe to the results of the same function must be managed.
+
+<br />
+<br />
+
+## 🦊 Ver 2.1.0: State & Function Management in React 🦊
 
 QuickRenard is your go-to library for streamlined global state and function management within React applications. The latest update, version 2.0.0, introduces a game-changing feature: the functionStore. This new capability complements the existing state management tools, enabling developers to create, invoke, and listen to global functions throughout their component hierarchy. It simplifies the management of cross-component logic and reduces the complexity of prop drilling.
 
@@ -527,5 +467,218 @@ function Cousin() {
 
 export default Cousin;
 ```
+
+<br />
+<br />
+
+## 🦊Ver 2.3.0 - Ver 2.5.0🦊
+
+### Added State Caching Logic:
+
+1. New Features for Performance Optimization: State caching enables swift retrieval of frequently accessed states, leading to overall performance improvements when using the library.
+
+2. Previously requested state values are stored in the cache. This allows for quick responses when the same state is requested again. This feature is especially beneficial for states that require complex calculations or database queries.
+
+3. It is effective in preventing network delays and server overloads. When managing remote data as state, caching can reduce the number of network requests, making data transfer more efficient.
+
+### Cautions Related to Caching:
+
+1. To manage memory, the cache expires after 15 minutes(default).
+
+2. From Ver 2.5.0 onwards, you can adjust the cache expiration time at your discretion. For the method and precautions, please refer to the following.
+
+3. Caution: The getCacheObject function exposes the library's internal state to the outside. This function should be used for development and debugging purposes only. Modifying the cache object externally can lead to unexpected issues in the library. Instead of directly altering the cache object, please use the APIs provided by the library to change the state. While it is possible to read and monitor the contents of the cache object, altering it is not recommended.
+
+```javascript
+// Example of using quickrenard
+import { initializeStore, getCacheObject, subscribeStateChange } from 'quickrenard';
+import { stateSchema } from './stateSchema';
+
+// Example: Set cache expiration time to 30 minutes
+initializeStore(stateSchema, { cacheExpirationTime: 1800000 });
+
+/** 🦊Optional Usage Example🦊: Function for cache expiration countdown */
+
+// Function for cache expiration countdown
+function cacheExpirationCountdown() {
+  // Get the current time
+  const now = performance.now();
+
+  // Access the cache object
+  const cache = getCacheObject();
+
+  console.clear();
+  console.log("Cache Expiration Countdown:");
+
+  // Iterate through each cache key and display the remaining time
+  Object.keys(cache).forEach(key => {
+    const record = cache[key];
+    if (record) {
+      const remainingTime = record.expirationTime - now;
+      if (remainingTime > 0) {
+        console.log(`${key}: ${Math.ceil(remainingTime / 1000)} seconds remaining`);
+      } else {
+        console.log(`${key}: Expired`);
+      }
+    }
+  });
+}
+
+// 🦊Optionally, run the countdown periodically🦊
+setInterval(cacheExpirationCountdown, 1000);
+
+/**  🦊Note🦊: This is an optional feature for monitoring cache expiration in the console.
+     Use it primarily for development and debugging purposes. It should be used
+     cautiously in a production environment as it can impact performance. */
+
+// Example of subscribing to state changes
+subscribeStateChange("someStateKey", (newState) => {
+  console.log("State changed:", newState);
+});
+```
+
+### Through this update, QuickRenard aims to enhance application performance and enable more efficient state management. The Ver 2.3.0 update has been focused particularly on large-scale applications and data-intensive tasks.
+
+<br />
+<br />
+
+## 🦊Ver 2.6.0🦊
+
+- The state management system has become more powerful. You can now effectively manage complex dependencies between states using graph traversal algorithms. Utilize Depth-First Search (DFS) and Breadth-First Search (BFS) algorithms to effectively handle the impacts of state updates on other states.
+
+1. Depth-First Search (DFS): Explores dependencies deeply connected between states. This method is suitable when there are deep connections between states.
+2. Breadth-First Search (BFS): Explores dependencies across a wider range of states. This method is useful for managing influences across a broader spectrum of states.
+3. User Flexibility: Users can choose to use DFS or BFS depending on the situation, or opt not to use them at all. This flexibility makes state management more efficient and effective.
+
+<br />
+<br />
+
+## 🦊Using setStateDependencies, updateStateBFS, and updateStateDFS Functions🦊
+
+1. setStateDependencies(dependencies): This function is used to define the dependencies between different states. For example, in the provided code, childData.data is set to depend on parentData and siblingData. This setup means that changes in childData.data might affect or require updates to parentData and siblingData.
+
+```javascript
+const dependencies = {
+    'childData.data': ['parentData', 'siblingData'],
+};
+setStateDependencies(dependencies);
+```
+
+2. updateStateDFS(stateKey, newValue): This function is used to update a state using the Depth-First Search approach. It's particularly useful when you need to explore and update states that are deeply interconnected. For example, if the new data's length is more than 10 characters, the updateStateDFS is called to update childData.data state.
+
+```javascript
+if (newData.length > 10) {
+    updateStateDFS('childData.data', newData);
+    console.log("Updated state using DFS method");
+}
+```
+
+3. updateStateBFS(stateKey, newValue): This function updates a state using the Breadth-First Search approach, suitable for situations where you need to manage the influence of a state change across a broad range of interconnected states. For example, if the new data's length is 10 characters or less, updateStateBFS is used.
+
+```javascript
+if (newData.length <= 10) {
+    updateStateBFS('childData.data', newData);
+    console.log("Updated state using BFS method");
+}
+```
+
+- These functions provide flexibility and powerful tools for managing complex state dependencies in React applications, allowing for more tailored and efficient state updates.
+
+<br />
+<br />
+
+## 🦊 Example Usage: 🦊
+
+1. child.js
+
+```javascript
+import React from 'react';
+import { useStateMutation, updateStateBFS, updateStateDFS, registerFunction } from 'quickrenard';
+
+function Child() {
+    const [setData, data] = useStateMutation('childData.data');
+
+    const handleUpdateData = () => {
+        const newData = "Updated Data from Child";
+
+        // Decide whether to use DFS or BFS based on the length of the data
+        if (newData.length > 10) {
+            updateStateDFS('childData.data', newData);
+            console.log("Updated state using DFS method");
+        } else {
+            updateStateBFS('childData.data', newData);
+            console.log("Updated state using BFS method");
+        }
+
+        // Update the state using the useStateMutation hook
+        setData(newData);
+    };
+
+    // Register a function that can be called by other components
+    registerFunction('childFunction', (message) => {
+        console.log("Message from Cousin:", message);
+        return "Response from Child";
+    });
+
+    return (
+        <div>
+            <h3>Child Component</h3>
+            <p>Data: {data}</p>
+            <button onClick={handleUpdateData}>Update Data</button>
+        </div>
+    );
+}
+
+export default Child;
+```
+
+2. stateSchema.js
+
+```javascript
+export const stateSchema = {
+    'childData.data': {
+        type: 'string',
+        defaultValue: 'Initial Child Data'
+    },
+    'parentData': {
+        type: 'string',
+        defaultValue: 'Initial Parent Data'
+    },
+    'siblingData': {
+        type: 'string',
+        defaultValue: 'Initial Sibling Data'
+    }
+};
+```
+
+3. stateStore.js
+
+```javascript
+import { initializeStore, getCacheObject, setStateDependencies } from 'quickrenard';
+import { stateSchema } from './stateSchema';
+
+// Define state dependencies
+const dependencies = {
+    'childData.data': ['parentData', 'siblingData'],
+};
+
+// Initialize Store
+initializeStore(stateSchema, { cacheExpirationTime: 1800000 });
+
+// Set state dependencies
+setStateDependencies(dependencies);
+```
+
+## 🦊 Summary 🦊
+
+1. child.js contains the Child component where the state childData.data is updated using either the DFS or BFS method, depending on the length of the new data.
+2. stateSchema.js defines the schema for the states used in the application.
+3. stateStore.js initializes the state store and sets the dependencies between states using setStateDependencies.
+
+- This example demonstrates how the quickrenard library can be used in a React project to manage state with complex dependencies, providing the flexibility to use DFS or BFS for state updates.
+
+<br />
+<hr />
+<br />
 
 The functionStore feature in QuickRenard version 2.1.0 offers an elegant solution to managing state and functions, making it a holistic choice for developers seeking efficiency and maintainability in their React applications. Adjust your component implementations as necessary to align with these examples and the unique details of your project. This documentation is designed to provide a conceptual understanding of QuickRenard's enhanced functionality.

@@ -171,7 +171,120 @@ export function initializeStore(schema, options = {}) {
     // console.log('Initialized state schema:', stateSchema);
 }
 
-export function setStateMutation(mutation, newValue) {
+/** 🦊Ver 2.6.0🦊: 상태 간의 종속성을, 그래프 탐색 알고리즘을 활용해 효과적으로 관리
+ *  각 상태는 그래프의 노드로 표현, 상태 간의 종속성은 노드 간의 간선으로 표현
+ * 
+ * 뉴비 풀스택 개발자인지라 아직 여러모로 배우고 공부하는 입장입니다.
+ * 주석이 길어도 쓸데없는 기능이 보여도 너그러운 양해 부탁드립니다.
+ */
+
+// 초기 stateDependencies 객체
+let stateDependencies = {};
+
+/**
+ * 사용자가 정의한 종속성을 설정하는 함수
+ * @param {Object} dependencies - 상태 간의 종속성을 정의한 객체
+ */
+export function setStateDependencies(dependencies) {
+    stateDependencies = dependencies;
+}
+
+/**
+ * 주어진 상태 키에 종속된 상태들을 찾는 함수
+ * @param {string} stateKey - 종속 상태를 찾을 상태 키
+ * @returns {string[]} 종속된 상태들의 키 배열
+ */
+function findDependentStates(stateKey) {
+    return stateDependencies[stateKey] || [];
+}
+
+/**
+ * DFS(깊이 우선 탐색)를 활용하여 상태를 업데이트하는 함수
+ * DFS는 시작 노드에서 가능한 한 깊게 탐색하는 알고리즘으로, 스택(후입선출)을 사용
+ * 탐색 경로를 되짚어가면서 이전 분기점을 쉽게 추적하는 것이 가능
+ *
+ * @param {string} stateKey 업데이트할 상태의 키.
+ * @param {any} newValue 상태에 설정할 새로운 값.
+ */
+export function updateStateDFS(stateKey, newValue) {
+    const visited = new Set(); // 방문한 노드를 추적하는 집합
+    const stack = [stateKey];  // 스택 초기화
+
+    while (stack.length > 0) {
+        const currentKey = stack.pop(); // 스택의 가장 위에 있는 요소를 가져옴
+
+        if (!visited.has(currentKey)) {
+            setStateMutation(currentKey, newValue); // 상태 업데이트 로직 수행
+            visited.add(currentKey);               // 현재 노드를 방문한 것으로 표시함
+
+            // 종속된 상태들을 가져옴
+            const dependentStates = findDependentStates(currentKey);
+            dependentStates.forEach(dependentKey => {
+                if (!visited.has(dependentKey)) {
+                    stack.push(dependentKey); // 종속된 상태를 스택에 추가
+                }
+            });
+        }
+    }
+}
+
+/**
+ * BFS(너비 우선 탐색)를 사용하여 상태를 업데이트하는 함수
+ * BFS는 시작 노드에서 가까운 노드부터 탐색하는 알고리즘으로, 큐(선입선출)를 사용
+ *
+ * @param {string} stateKey 업데이트할 상태의 키.
+ * @param {any} newValue 상태에 설정할 새로운 값.
+ */
+export function updateStateBFS(stateKey, newValue) {
+    const visited = new Set(); // 방문한 노드를 추적하는 집합
+    const queue = [stateKey];  // 큐 초기화
+
+    while (queue.length > 0) {
+        const currentKey = queue.shift(); // 큐의 가장 앞에 있는 요소를 가져옴
+
+        if (!visited.has(currentKey)) {
+            setStateMutation(currentKey, newValue); // 상태 업데이트 로직 수행
+            visited.add(currentKey);               // 현재 노드를 방문한 것으로 표시
+
+            // 종속된 상태들을 가져옴
+            const dependentStates = findDependentStates(currentKey);
+            dependentStates.forEach(dependentKey => {
+                if (!visited.has(dependentKey)) {
+                    queue.push(dependentKey); // 종속된 상태를 큐에 추가
+                }
+            });
+        }
+    }
+}
+
+/**
+ * 사용자가 제공한 조건에 따라 DFS를 사용할지 여부를 결정
+ *
+ * @param {string} mutation 상태 변화의 키
+ * @param {Function} condition 사용자 정의 조건 함수
+ * @returns {boolean} DFS 사용 여부
+ */
+function useDFSCondition(mutation, condition) {
+    // 사용자가 제공한 조건에 따라 DFS 사용 여부를 결정
+    return condition(mutation);
+}
+
+/**
+ * 사용자가 제공한 조건에 따라 BFS를 사용할지 여부를 결정
+ *
+ * @param {string} mutation 상태 변화의 키
+ * @param {Function} condition 사용자 정의 조건 함수
+ * @returns {boolean} BFS 사용 여부
+ */
+function useBFSCondition(mutation, condition) {
+    // 사용자가 제공한 조건에 따라 BFS 사용 여부를 결정
+    return condition(mutation);
+}
+
+/** 🦊Ver 2.6.0🦊: 상태 간의 종속성을, 그래프 탐색 알고리즘을 활용해 효과적으로 관리*/
+
+
+export function setStateMutation(mutation, newValue, useDFSCondition, useBFSCondition) {
     // 스키마 항목 가져오기 - stateSchema에서 직접 가져옴
     const schemaEntry = stateSchema[mutation];
     console.log(`Mutation '${mutation}' schema entry:`, schemaEntry);
@@ -214,6 +327,19 @@ export function setStateMutation(mutation, newValue) {
     // 상태 저장 및 캐시 업데이트
     deepSet(stateStore, mutation, newValue);
     setCache(mutation, newValue); // 캐시에도 새로운 값을 저장
+
+    // DFS와 BFS 조건 함수를 확인하고 호출
+    const useDFS = typeof useDFSCondition === 'function' ? useDFSCondition(mutation) : false;
+    const useBFS = typeof useBFSCondition === 'function' ? useBFSCondition(mutation) : false;
+
+    if (useDFS) {
+        updateStateDFS(mutation, newValue);
+    } else if (useBFS) {
+        updateStateBFS(mutation, newValue);
+    } else {
+        // 조건이 충족되지 않는 경우, 추가적인 종속 상태 업데이트는 수행하지 않음
+    }
+
     // 구독자에게 변경 알림
     subscribers[mutation]?.forEach((callback) => callback(newValue)); // 구독자에게 변경 알림
 }

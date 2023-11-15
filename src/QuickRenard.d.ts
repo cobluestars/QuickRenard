@@ -1,6 +1,10 @@
 // stateStore.ts에서 export된 함수들을 재-export
 export { 
-    initializeStore, 
+    initializeStore,
+    setStateDependencies,
+    updateStateDFS,
+    updateStateBFS, 
+    getCacheObject,
     getState, 
     setStateMutation, 
     subscribeStateChange 
