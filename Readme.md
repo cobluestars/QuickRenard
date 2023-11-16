@@ -677,4 +677,4 @@ setStateDependencies(dependencies);
 <hr />
 <br />
 
-The functionStore feature in QuickRenard version 2.1.0 offers an elegant solution to managing state and functions, making it a holistic choice for developers seeking efficiency and maintainability in their React applications. Adjust your component implementations as necessary to align with these examples and the unique details of your project. This documentation is designed to provide a conceptual understanding of QuickRenard's enhanced functionality.
+Adjust your component implementations as necessary to align with these examples and the unique details of your project. This documentation is designed to provide a conceptual understanding of QuickRenard's enhanced functionality.

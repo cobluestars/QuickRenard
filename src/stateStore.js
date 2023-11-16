@@ -354,16 +354,25 @@ function clearExpiredCache() {
     });
 }
 
+// cleanupCache 함수에 의해 설정된 타이머 ID를 저장할 전역변수
+let cleanupTimer;
+
 // 만료된 캐시 항목을 삭제하는 로직을 주기적으로 실행할 수 있는 함수
 function cleanupCache() {
     // 현재 시간을 기준으로 만료된 캐시 항목 제거
     clearExpiredCache();
     // 다음 정리를 위한 타이머 설정
-    setTimeout(cleanupCache, CACHE_EXPIRATION_TIME);
+    cleanupTimer = setTimeout(cleanupCache, CACHE_EXPIRATION_TIME);
 }
 
 // 캐시 정리 함수 초기 호출
 cleanupCache();
+
+// cleanup 함수 구현
+export function cleanup() {
+    // 타이머 정리
+    clearTimeout(cleanupTimer);
+}
 
 export function setState(mutation, newValue) {
     // 상태 검증 및 저장 부분
