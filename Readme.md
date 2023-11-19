@@ -149,7 +149,7 @@
 
 1. DFS(깊이 우선 탐색): 깊게 연결된 상태 간의 종속성을 탐색합니다. 이 방식은 상태 간에 깊은 연결이 있는 경우에 적합합니다.
 2. BFS(너비 우선 탐색): 넓은 범위의 상태 간의 종속성을 탐색합니다. 이 방식은 더 넓은 범위의 상태 간 영향을 관리할 때 유용합니다.
-3. 사용자는 상황에 따라 DFS 또는 BFS를 선택하여 사용할 수 있습니다. 물론, 사용하지 않을 수도 있지요. 이를 통해 상태 관리가 더욱 유연하고 효율적으로 이루어집니다.
+3. Ver 2.6.5부터는 상태 간의 종속성을 관리할 시, updateState함수가 DFS로 처리할지, BFS로 처리할지 자동으로 판별해 줍니다. 이를 통해 상태 관리가 더욱 유연하고 효율적으로 이루어집니다.
 
 ### DFS 또는 BFS 관련 설정을 사용하려면, 아래의 !!! How to use !!! 를 참조하세요.
 
@@ -538,20 +538,28 @@ subscribeStateChange("someStateKey", (newState) => {
 <br />
 <br />
 
-## 🦊Ver 2.6.0🦊
+## 🦊Ver 2.6.0 - Ver 2.6.5🦊
 
 - The state management system has become more powerful. You can now effectively manage complex dependencies between states using graph traversal algorithms. Utilize Depth-First Search (DFS) and Breadth-First Search (BFS) algorithms to effectively handle the impacts of state updates on other states.
 
 1. Depth-First Search (DFS): Explores dependencies deeply connected between states. This method is suitable when there are deep connections between states.
 2. Breadth-First Search (BFS): Explores dependencies across a wider range of states. This method is useful for managing influences across a broader spectrum of states.
-3. User Flexibility: Users can choose to use DFS or BFS depending on the situation, or opt not to use them at all. This flexibility makes state management more efficient and effective.
+3. Enhanced State Management(❗Ver 2.6.5❗): The state management system is now even more intelligent. It automatically determines the most effective graph traversal strategy (DFS or BFS) to manage complex dependencies between states. This enhancement simplifies the process of managing state updates and their impacts on other states.
+
+### - Key Features:
+1. Automated Strategy Selection: The system now automatically selects between Depth-First Search (DFS) and Breadth-First Search (BFS) based on the nature of state dependencies.
+
+- DFS is chosen for deeply connected state dependencies (e.g., A -> B -> C).
+- BFS is used when a state has multiple parallel dependencies (e.g., A -> [B, C, D]).
+
+2. Simplified State Updates: Users no longer need to manually choose between DFS and BFS. The system intelligently decides the optimal approach, making state management more efficient and effective.
 
 <br />
 <br />
 
-## 🦊Using setStateDependencies, updateStateBFS, and updateStateDFS Functions🦊
+## 🦊 Using setStateDependencies and updateState Functions 🦊
 
-1. setStateDependencies(dependencies): This function is used to define the dependencies between different states. For example, in the provided code, childData.data is set to depend on parentData and siblingData. This setup means that changes in childData.data might affect or require updates to parentData and siblingData.
+1. setStateDependencies(dependencies): Define the dependencies between different states. The system will use these dependencies to determine the traversal strategy.
 
 ```javascript
 const dependencies = {
@@ -560,25 +568,15 @@ const dependencies = {
 setStateDependencies(dependencies);
 ```
 
-2. updateStateDFS(stateKey, newValue): This function is used to update a state using the Depth-First Search approach. It's particularly useful when you need to explore and update states that are deeply interconnected. For example, if the new data's length is more than 10 characters, the updateStateDFS is called to update childData.data state.
+2. updateState(stateKey, newValue): Update a state, and the system will automatically use DFS or BFS as needed.
 
 ```javascript
-if (newData.length > 10) {
-    updateStateDFS('childData.data', newData);
-    console.log("Updated state using DFS method");
-}
+const newData = "Some Data";
+updateState('childData.data', newData);
+console.log("State updated with the appropriate strategy");
 ```
 
-3. updateStateBFS(stateKey, newValue): This function updates a state using the Breadth-First Search approach, suitable for situations where you need to manage the influence of a state change across a broad range of interconnected states. For example, if the new data's length is 10 characters or less, updateStateBFS is used.
-
-```javascript
-if (newData.length <= 10) {
-    updateStateBFS('childData.data', newData);
-    console.log("Updated state using BFS method");
-}
-```
-
-- These functions provide flexibility and powerful tools for managing complex state dependencies in React applications, allowing for more tailored and efficient state updates.
+- This approach provides a more streamlined and powerful tool for managing complex state dependencies, allowing for more tailored and efficient state updates.
 
 <br />
 <br />
@@ -589,32 +587,19 @@ if (newData.length <= 10) {
 
 ```javascript
 import React from 'react';
-import { useStateMutation, updateStateBFS, updateStateDFS, registerFunction } from 'quickrenard';
+import { useStateMutation, updateState } from 'quickrenard';
 
 function Child() {
     const [setData, data] = useStateMutation('childData.data');
 
     const handleUpdateData = () => {
         const newData = "Updated Data from Child";
-
-        // Decide whether to use DFS or BFS based on the length of the data
-        if (newData.length > 10) {
-            updateStateDFS('childData.data', newData);
-            console.log("Updated state using DFS method");
-        } else {
-            updateStateBFS('childData.data', newData);
-            console.log("Updated state using BFS method");
-        }
+        updateState('childData.data', newData);
+        console.log("State updated with the appropriate strategy");
 
         // Update the state using the useStateMutation hook
         setData(newData);
     };
-
-    // Register a function that can be called by other components
-    registerFunction('childFunction', (message) => {
-        console.log("Message from Cousin:", message);
-        return "Response from Child";
-    });
 
     return (
         <div>
@@ -650,7 +635,7 @@ export const stateSchema = {
 3. stateStore.js
 
 ```javascript
-import { initializeStore, getCacheObject, setStateDependencies } from 'quickrenard';
+import { initializeStore, setStateDependencies } from 'quickrenard';
 import { stateSchema } from './stateSchema';
 
 // Define state dependencies
@@ -659,7 +644,7 @@ const dependencies = {
 };
 
 // Initialize Store
-initializeStore(stateSchema, { cacheExpirationTime: 1800000 });
+initializeStore(stateSchema);
 
 // Set state dependencies
 setStateDependencies(dependencies);
@@ -667,14 +652,10 @@ setStateDependencies(dependencies);
 
 ## 🦊 Summary 🦊
 
-1. child.js contains the Child component where the state childData.data is updated using either the DFS or BFS method, depending on the length of the new data.
-2. stateSchema.js defines the schema for the states used in the application.
-3. stateStore.js initializes the state store and sets the dependencies between states using setStateDependencies.
-
-- This example demonstrates how the quickrenard library can be used in a React project to manage state with complex dependencies, providing the flexibility to use DFS or BFS for state updates.
+- Ver 2.6.5 simplifies state management in applications with complex dependencies, automatically choosing the most efficient graph traversal strategy (DFS or BFS) based on the defined state dependencies. This enhancement streamlines state updates, reducing the need for manual intervention and improving efficiency.
 
 <br />
 <hr />
 <br />
 
-Adjust your component implementations as necessary to align with these examples and the unique details of your project. This documentation is designed to provide a conceptual understanding of QuickRenard's enhanced functionality.
+### Adjust your component implementations as necessary to align with these examples and the unique details of your project. This documentation is designed to provide a conceptual understanding of QuickRenard's enhanced functionality.

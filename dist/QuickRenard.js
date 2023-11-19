@@ -4,8 +4,7 @@
 export { 
     initializeStore,
     setStateDependencies,
-    updateStateDFS,
-    updateStateBFS, 
+    updateState,
     getCacheObject,
     getState, 
     setStateMutation, 

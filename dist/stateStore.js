@@ -206,7 +206,7 @@ function findDependentStates(stateKey) {
  * @param {string} stateKey 업데이트할 상태의 키.
  * @param {any} newValue 상태에 설정할 새로운 값.
  */
-export function updateStateDFS(stateKey, newValue) {
+function updateStateDFS(stateKey, newValue) {
     const visited = new Set(); // 방문한 노드를 추적하는 집합
     const stack = [stateKey];  // 스택 초기화
 
@@ -235,7 +235,7 @@ export function updateStateDFS(stateKey, newValue) {
  * @param {string} stateKey 업데이트할 상태의 키.
  * @param {any} newValue 상태에 설정할 새로운 값.
  */
-export function updateStateBFS(stateKey, newValue) {
+function updateStateBFS(stateKey, newValue) {
     const visited = new Set(); // 방문한 노드를 추적하는 집합
     const queue = [stateKey];  // 큐 초기화
 
@@ -279,6 +279,43 @@ function useDFSCondition(mutation, condition) {
 function useBFSCondition(mutation, condition) {
     // 사용자가 제공한 조건에 따라 BFS 사용 여부를 결정
     return condition(mutation);
+}
+
+/**
+ * 주어진 상태에 대해 DFS 또는 BFS를 사용할지 결정하는 함수
+ * @param {string} stateKey - 분석할 상태 키
+ * @returns {string} 'DFS' 또는 'BFS'
+ */
+function determineSearchStrategy(stateKey) {
+    const dependencies = stateDependencies[stateKey];
+    
+    if (dependencies && dependencies.length) {
+        // DFS 조건: 종속된 상태가 다른 상태에 종속될 경우
+        for (let dependent of dependencies) {
+            if (stateDependencies[dependent] && stateDependencies[dependent].length) {
+                return 'DFS';
+            }
+        }
+
+        // BFS 조건: 상태에 둘 이상의 종속된 상태들이 있는 경우
+        if (dependencies.length >= 2) {
+            return 'BFS';
+        }
+    }
+
+    // 기본적으로는 DFS 사용
+    return 'DFS';
+}
+
+// 기존의 updateStateDFS와 updateStateBFS 함수 내에서 이 함수를 사용하여 결정
+export function updateState(stateKey, newValue) {
+    const strategy = determineSearchStrategy(stateKey);
+
+    if (strategy === 'DFS') {
+        updateStateDFS(stateKey, newValue);
+    } else {
+        updateStateBFS(stateKey, newValue);
+    }
 }
 
 /** 🦊Ver 2.6.0🦊: 상태 간의 종속성을, 그래프 탐색 알고리즘을 활용해 효과적으로 관리*/
@@ -354,16 +391,25 @@ function clearExpiredCache() {
     });
 }
 
+// cleanupCache 함수에 의해 설정된 타이머 ID를 저장할 전역변수
+let cleanupTimer;
+
 // 만료된 캐시 항목을 삭제하는 로직을 주기적으로 실행할 수 있는 함수
 function cleanupCache() {
     // 현재 시간을 기준으로 만료된 캐시 항목 제거
     clearExpiredCache();
     // 다음 정리를 위한 타이머 설정
-    setTimeout(cleanupCache, CACHE_EXPIRATION_TIME);
+    cleanupTimer = setTimeout(cleanupCache, CACHE_EXPIRATION_TIME);
 }
 
 // 캐시 정리 함수 초기 호출
 cleanupCache();
+
+// cleanup 함수 구현
+export function cleanup() {
+    // 타이머 정리
+    clearTimeout(cleanupTimer);
+}
 
 export function setState(mutation, newValue) {
     // 상태 검증 및 저장 부분

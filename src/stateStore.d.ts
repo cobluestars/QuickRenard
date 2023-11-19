@@ -28,6 +28,6 @@ export declare function getCacheObject(): Record<string, any>;
 export declare function setStateDependencies(dependencies: StateDependencies): void;
 
 // DFS 및 BFS 업데이트 함수 선언
-export declare function updateStateDFS(stateKey: string, newValue: any): void;
-export declare function updateStateBFS(stateKey: string, newValue: any): void;
+export declare function updateState(stateKey: string, newValue: any): void;
+
 export {};
