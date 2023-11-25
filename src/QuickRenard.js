@@ -1,4 +1,4 @@
-// ./src/QuickRenard.js
+// QuickRenard.js
 
 // stateStore.js에서 export된 함수들을 재-export
 export { 

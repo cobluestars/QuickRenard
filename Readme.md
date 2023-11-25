@@ -143,15 +143,23 @@
 <hr />
 <br />
 
-## 🦊Ver 2.6.0🦊
+## 🦊Ver 2.6.0 - Ver 2.7.0🦊
 
 - 상태 관리 시스템이 더욱 강력해졌습니다. 이제 상태 간의 복잡한 종속성을 그래프 탐색 알고리즘으로 효과적으로 관리할 수 있습니다. DFS(깊이 우선 탐색)와 BFS(너비 우선 탐색) 알고리즘을 활용하여, 상태의 업데이트가 다른 상태에 미치는 영향을 효과적으로 처리합니다.
 
 1. DFS(깊이 우선 탐색): 깊게 연결된 상태 간의 종속성을 탐색합니다. 이 방식은 상태 간에 깊은 연결이 있는 경우에 적합합니다.
 2. BFS(너비 우선 탐색): 넓은 범위의 상태 간의 종속성을 탐색합니다. 이 방식은 더 넓은 범위의 상태 간 영향을 관리할 때 유용합니다.
-3. Ver 2.6.5부터는 상태 간의 종속성을 관리할 시, updateState함수가 DFS로 처리할지, BFS로 처리할지 자동으로 판별해 줍니다. 이를 통해 상태 관리가 더욱 유연하고 효율적으로 이루어집니다.
+3. Ver 2.7.0부터는 상태 간의 종속성을 관리할 시, updateState함수가 DFS로 처리할지, BFS로 처리할지 자동으로 판별해 줍니다. 이를 통해 상태 관리가 더욱 유연하고 효율적으로 이루어집니다.
 
-### DFS 또는 BFS 관련 설정을 사용하려면, 아래의 !!! How to use !!! 를 참조하세요.
+### DFS 또는 BFS 관련 설정을 사용하려면, 아래의 ❗❗❗ How to use ❗❗❗ 를 참조하세요.
+
+<br />
+<hr />
+<br />
+
+## 🦊Ver 2.7.1 - 🦊
+
+- Lodash로부터 독립했습니다.
 
 <br />
 <br />
@@ -538,13 +546,13 @@ subscribeStateChange("someStateKey", (newState) => {
 <br />
 <br />
 
-## 🦊Ver 2.6.0 - Ver 2.6.5🦊
+## 🦊Ver 2.6.0 - Ver 2.7.0🦊
 
 - The state management system has become more powerful. You can now effectively manage complex dependencies between states using graph traversal algorithms. Utilize Depth-First Search (DFS) and Breadth-First Search (BFS) algorithms to effectively handle the impacts of state updates on other states.
 
 1. Depth-First Search (DFS): Explores dependencies deeply connected between states. This method is suitable when there are deep connections between states.
 2. Breadth-First Search (BFS): Explores dependencies across a wider range of states. This method is useful for managing influences across a broader spectrum of states.
-3. Enhanced State Management(❗Ver 2.6.5❗): The state management system is now even more intelligent. It automatically determines the most effective graph traversal strategy (DFS or BFS) to manage complex dependencies between states. This enhancement simplifies the process of managing state updates and their impacts on other states.
+3. Enhanced State Management(❗Ver 2.7.0❗): The state management system is now even more intelligent. It automatically determines the most effective graph traversal strategy (DFS or BFS) to manage complex dependencies between states. This enhancement simplifies the process of managing state updates and their impacts on other states.
 
 ### - Key Features:
 1. Automated Strategy Selection: The system now automatically selects between Depth-First Search (DFS) and Breadth-First Search (BFS) based on the nature of state dependencies.
@@ -619,7 +627,9 @@ export default Child;
 export const stateSchema = {
     'childData.data': {
         type: 'string',
-        defaultValue: 'Initial Child Data'
+        defaultValue: 'Initial Child Data',
+        // Define dependencies that will trigger BFS
+        dependencies: ['parentData', 'siblingData'] // These are parallel dependencies
     },
     'parentData': {
         type: 'string',
@@ -652,7 +662,14 @@ setStateDependencies(dependencies);
 
 ## 🦊 Summary 🦊
 
-- Ver 2.6.5 simplifies state management in applications with complex dependencies, automatically choosing the most efficient graph traversal strategy (DFS or BFS) based on the defined state dependencies. This enhancement streamlines state updates, reducing the need for manual intervention and improving efficiency.
+- Ver 2.7.0 simplifies state management in applications with complex dependencies, automatically choosing the most efficient graph traversal strategy (DFS or BFS) based on the defined state dependencies. This enhancement streamlines state updates, reducing the need for manual intervention and improving efficiency.
+
+<br />
+<br />
+
+## 🦊Ver 2.7.1 - 🦊
+
+- Independent from Lodash.
 
 <br />
 <hr />

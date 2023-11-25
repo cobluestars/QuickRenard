@@ -1,15 +1,7 @@
 const path = require('path');
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = {
   mode: 'production', // 'production' 모드로 변경하여 최적화 가능 (development: 개발 모드)
-  plugins: [
-    new LodashModuleReplacementPlugin
-    ({
-      'collections': true,
-      'paths': true
-    })
-  ],
   entry: './src/QuickRenard.ts', // 진입점 파일을 QuickRenard.ts로 변경
   output: {
     filename: 'QuickRenard.js', // 출력 파일 이름

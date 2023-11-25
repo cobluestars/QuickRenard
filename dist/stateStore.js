@@ -6,32 +6,73 @@ subscribers 객체는 이벤트 구독 패턴을 사용하여 상태 변화를 �
 
 상태 캐싱을 위한 객체도 해시 테이블 형태로 키-값 쌍을 저장하여 빠른 검색이 가능 */
 
-import get from 'lodash/get';
-import set from 'lodash/set';
-
 const stateStore = {}; // 초기 상태 저장소 (Redux Store와 유사)
 const subscribers = {}; // 상태 변화를 구독하는 콜백 함수들을 저장하는 객체
 let stateSchema = {}; // 상태 스키마 저장 변수
 const stateCache = {}; // 상태 캐싱을 위한 객체
 
 function deepGet(obj, path) {
-  // 캐시된 값을 먼저 확인
-  const cachedValue = stateCache[path];
-  if (cachedValue !== undefined) {
-    return cachedValue; // 캐시된 값이 있으면 반환
-  }
-  // lodash의 get 함수를 사용하여 값을 가져옴
-  const value = get(obj, path);
-  stateCache[path] = value; // 값을 캐시에 저장
-  return value;
+    // 캐시된 값이 있는지 먼저 확인
+    const cachedValue = stateCache[path];
+    if (cachedValue !== undefined) {
+      return cachedValue; // 캐시된 값이 있으면 반환
+    }
+  
+    // 입력된 obj가 객체가 아니거나, path가 문자열이 아니면 undefined 반환
+    if (!obj || typeof obj !== 'object' || typeof path !== 'string') {
+      return undefined;
+    }
+  
+    // 배열 인덱스 (예: [0])를 점 표기법으로 변환 (예: .0)
+    const segments = path.replace(/\[(\w+)\]/g, '.$1').split('.');
+  
+    let current = obj;
+  
+    // 경로의 각 세그먼트를 순회
+    for (const segment of segments) {
+      // 현재 세그먼트가 객체에 존재하면 해당 값으로 이동
+      if (segment in current) {
+        current = current[segment];
+      } else {
+        // 존재하지 않으면 undefined 반환
+        return undefined;
+      }
+    }
+  
+    stateCache[path] = current; // 캐시에 값을 저장
+    return current; // 최종적으로 찾은 값을 반환
 }
 
 function deepSet(obj, path, value) {
-  // lodash의 set 함수를 사용하여 값을 설정
-  set(obj, path, value);
-  stateCache[path] = value; // 새로운 값을 캐시에도 저장
-}
-
+    // 입력된 obj가 객체가 아니거나, path가 문자열이 아니면 함수 종료
+    if (!obj || typeof obj !== 'object' || typeof path !== 'string') {
+      return;
+    }
+  
+    // 배열 인덱스 (예: [0])를 점 표기법으로 변환 (예: .0)
+    const segments = path.replace(/\[(\w+)\]/g, '.$1').split('.');
+  
+    let current = obj;
+  
+    // 경로의 마지막 세그먼트를 제외하고 순회
+    for (let i = 0; i < segments.length - 1; i++) {
+      const segment = segments[i];
+  
+      // 현재 세그먼트가 존재하지 않으면 새로운 객체 또는 배열 생성
+      if (!(segment in current)) {
+        // 다음 세그먼트가 숫자면 배열, 아니면 객체 생성
+        current[segment] = /^\d+$/.test(segments[i + 1]) ? [] : {};
+      }
+  
+      // 다음 세그먼트로 이동
+      current = current[segment];
+    }
+  
+    // 마지막 세그먼트에 값을 설정
+    current[segments[segments.length - 1]] = value;
+    stateCache[path] = value; // 캐시에 새로운 값을 저장
+ }
+  
 function isValidType(value, schemaEntry) {
     if (!schemaEntry) {
         console.error("스키마 항목이 정의되지 않음. state schema가 올바르게 초기화되었는지 확인하시길...");

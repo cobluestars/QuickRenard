@@ -1,6 +1,6 @@
 {
   "name": "quickrenard",
-  "version": "2.6.5",
+  "version": "2.7.1",
   "description": "\"Quick Renard (QR) - A state (and function) management library for React, inspired by GraphQL principles, offering a flexible querying and mutation system.\"",
   "main": "dist/QuickRenard.js",
   "types": "dist/QuickRenard.d.ts",
@@ -18,9 +18,6 @@
     "url": "git+https://github.com/cobluestars/QuickRenard.git"
   },
   "license": "ISC",
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.0.0"
   },
