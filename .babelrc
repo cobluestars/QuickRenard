@@ -3,6 +3,5 @@
       "@babel/preset-env", 
       ["@babel/preset-react", {"runtime": "automatic"}], // React 17 이상에서 해당 설정 적용 필요
       "@babel/preset-typescript"
-    ],
-    "plugins": ["lodash"]
+    ]
 }  

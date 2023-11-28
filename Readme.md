@@ -676,3 +676,11 @@ setStateDependencies(dependencies);
 <br />
 
 ### Adjust your component implementations as necessary to align with these examples and the unique details of your project. This documentation is designed to provide a conceptual understanding of QuickRenard's enhanced functionality.
+
+<br />
+<hr />
+<br />
+
+## 🦊License🦊
+
+- This project is licensed under the MIT License - see the LICENSE.md file for details.
