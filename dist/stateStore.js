@@ -239,63 +239,82 @@ function findDependentStates(stateKey) {
     return stateDependencies[stateKey] || [];
 }
 
+// 🦊Ver 2.8.1🦊: DFS를 비동기적으로 처리
 /**
- * DFS(깊이 우선 탐색)를 활용하여 상태를 업데이트하는 함수
- * DFS는 시작 노드에서 가능한 한 깊게 탐색하는 알고리즘으로, 스택(후입선출)을 사용
- * 탐색 경로를 되짚어가면서 이전 분기점을 쉽게 추적하는 것이 가능
- *
+ * DFS(깊이 우선 탐색)를 사용하여 상태를 업데이트하는 비동기 함수.
+ * DFS는 시작 노드에서 가능한 한 깊게 탐색하는 알고리즘.
+ * 스택을 사용하여 현재 노드에서 가능한 한 깊은 노드로 이동하며,
+ * 더 이상 탐색할 노드가 없을 때 마지막으로 방문한 노드로 되돌아감.
+ * 이를 통해 상태와 그에 종속된 상태들을 깊이 우선 방식으로 업데이트.
+ * 
  * @param {string} stateKey 업데이트할 상태의 키.
  * @param {any} newValue 상태에 설정할 새로운 값.
+ * @returns {Promise} 상태 업데이트 완료를 알리는 Promise.
  */
 function updateStateDFS(stateKey, newValue) {
-    const visited = new Set(); // 방문한 노드를 추적하는 집합
-    const stack = [stateKey];  // 스택 초기화
+    return new Promise((resolve, reject) => {
+        try {
+            const visited = new Set(); // 방문한 노드를 추적하기 위한 집합
+            const stack = [stateKey];  // 스택을 사용하여 탐색 순서를 관리
 
-    while (stack.length > 0) {
-        const currentKey = stack.pop(); // 스택의 가장 위에 있는 요소를 가져옴
+            while (stack.length > 0) {
+                const currentKey = stack.pop(); // 스택의 가장 위에 있는 요소를 가져옴
+                if (!visited.has(currentKey)) {
+                    setStateMutation(currentKey, newValue); // 상태 업데이트
+                    visited.add(currentKey); // 현재 노드를 방문한 것으로 표시
 
-        if (!visited.has(currentKey)) {
-            setStateMutation(currentKey, newValue); // 상태 업데이트 로직 수행
-            visited.add(currentKey);               // 현재 노드를 방문한 것으로 표시함
-
-            // 종속된 상태들을 가져옴
-            const dependentStates = findDependentStates(currentKey);
-            dependentStates.forEach(dependentKey => {
-                if (!visited.has(dependentKey)) {
-                    stack.push(dependentKey); // 종속된 상태를 스택에 추가
+                    // 종속된 상태들을 가져와 스택에 추가
+                    findDependentStates(currentKey).forEach(dependentKey => {
+                        if (!visited.has(dependentKey)) {
+                            stack.push(dependentKey);
+                        }
+                    });
                 }
-            });
+            }
+            resolve();
+        } catch (err) {
+            reject(err);
         }
-    }
+    });
 }
 
+// 🦊Ver 2.8.1🦊: BFS를 비동기적으로 처리
 /**
- * BFS(너비 우선 탐색)를 사용하여 상태를 업데이트하는 함수
- * BFS는 시작 노드에서 가까운 노드부터 탐색하는 알고리즘으로, 큐(선입선출)를 사용
- *
+ * BFS(너비 우선 탐색)를 사용하여 상태를 업데이트하는 비동기 함수.
+ * BFS는 시작 노드에서 가장 가까운 노드를 먼저 탐색하는 알고리즘입니다.
+ * 큐를 사용하여 현재 노드에서 가장 가까운 노드부터 차례대로 탐색하며,
+ * 모든 인접한 노드를 방문한 후에 더 먼 노드로 이동합니다.
+ * 이를 통해 상태와 그에 종속된 상태들을 너비 우선 방식으로 업데이트합니다.
+ * 
  * @param {string} stateKey 업데이트할 상태의 키.
  * @param {any} newValue 상태에 설정할 새로운 값.
+ * @returns {Promise} 상태 업데이트 완료를 알리는 Promise.
  */
 function updateStateBFS(stateKey, newValue) {
-    const visited = new Set(); // 방문한 노드를 추적하는 집합
-    const queue = [stateKey];  // 큐 초기화
+    return new Promise((resolve, reject) => {
+        try {
+            const visited = new Set(); // 방문한 노드를 추적하기 위한 집합
+            const queue = [stateKey];  // 큐를 사용하여 탐색 순서를 관리
 
-    while (queue.length > 0) {
-        const currentKey = queue.shift(); // 큐의 가장 앞에 있는 요소를 가져옴
+            while (queue.length > 0) {
+                const currentKey = queue.shift(); // 큐의 가장 앞에 있는 요소를 가져옴
+                if (!visited.has(currentKey)) {
+                    setStateMutation(currentKey, newValue); // 상태 업데이트
+                    visited.add(currentKey); // 현재 노드를 방문한 것으로 표시
 
-        if (!visited.has(currentKey)) {
-            setStateMutation(currentKey, newValue); // 상태 업데이트 로직 수행
-            visited.add(currentKey);               // 현재 노드를 방문한 것으로 표시
-
-            // 종속된 상태들을 가져옴
-            const dependentStates = findDependentStates(currentKey);
-            dependentStates.forEach(dependentKey => {
-                if (!visited.has(dependentKey)) {
-                    queue.push(dependentKey); // 종속된 상태를 큐에 추가
+                    // 종속된 상태들을 가져와 큐에 추가
+                    findDependentStates(currentKey).forEach(dependentKey => {
+                        if (!visited.has(dependentKey)) {
+                            queue.push(dependentKey);
+                        }
+                    });
                 }
-            });
+            }
+            resolve();
+        } catch (err) {
+            reject(err);
         }
-    }
+    });
 }
 
 /**
@@ -348,19 +367,45 @@ function determineSearchStrategy(stateKey) {
     return 'DFS';
 }
 
-// 기존의 updateStateDFS와 updateStateBFS 함수 내에서 이 함수를 사용하여 결정
+// 🦊Ver 2.8.1🦊: 상태 업데이트를 비동기적으로 처리
+/**
+ * 상태를 업데이트하는 함수.
+ * 주어진 상태와 그에 종속된 상태들을 DFS 또는 BFS 전략에 따라 업데이트.
+ * 비동기적으로 처리되며, 상태 업데이트가 완료될 때까지 기다릴 수 있음.
+ *
+ * @param {string} stateKey 업데이트할 상태의 키.
+ * @param {any} newValue 상태에 설정할 새로운 값.
+ * @returns {Promise} 상태 업데이트 완료를 알리는 Promise.
+ */
 export function updateState(stateKey, newValue) {
-    const strategy = determineSearchStrategy(stateKey);
-
-    if (strategy === 'DFS') {
-        updateStateDFS(stateKey, newValue);
-    } else {
-        updateStateBFS(stateKey, newValue);
-    }
+    return new Promise((resolve, reject) => {
+        try {
+            const strategy = determineSearchStrategy(stateKey);
+            if (strategy === 'DFS') {
+                updateStateDFS(stateKey, newValue).then(resolve).catch(reject);
+            } else {
+                updateStateBFS(stateKey, newValue).then(resolve).catch(reject);
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
 }
 
-/** 🦊Ver 2.6.0🦊: 상태 간의 종속성을, 그래프 탐색 알고리즘을 활용해 효과적으로 관리*/
 
+/** 🦊Ver 2.6.0🦊: 상태 간의 종속성을, 그래프 탐색 알고리즘을 활용해 효과적으로 관리*/
+/**
+ * 🦊Ver 2.8.1🦊:
+ * 주어진 상태의 변화를 설정하는 함수.
+ * 이 함수는 상태의 유효성을 검사하고, 상태 저장소 및 캐시에 값을 저장.
+ * 또한, DFS나 BFS 조건에 따라 관련 상태의 업데이트를 비동기적으로 수행.
+ * 
+ * @param {string} mutation 상태 변화의 키.
+ * @param {any} newValue 상태에 설정할 새로운 값.
+ * @param {Function} useDFSCondition DFS 사용 조건 함수.
+ * @param {Function} useBFSCondition BFS 사용 조건 함수.
+ * @returns {Promise} 상태 변화 완료를 알리는 Promise.
+ */
 
 export function setStateMutation(mutation, newValue, useDFSCondition, useBFSCondition) {
     // 스키마 항목 가져오기 - stateSchema에서 직접 가져옴
@@ -402,24 +447,30 @@ export function setStateMutation(mutation, newValue, useDFSCondition, useBFSCond
             return;
         }
     }
-    // 상태 저장 및 캐시 업데이트
-    deepSet(stateStore, mutation, newValue);
-    setCache(mutation, newValue); // 캐시에도 새로운 값을 저장
+    // 비동기 업데이트를 위한 Promise 반환
+    return new Promise((resolve, reject) => {
+        try {
+            // 상태 저장 및 캐시 업데이트
+            deepSet(stateStore, mutation, newValue);
+            setCache(mutation, newValue); // 캐시에도 새로운 값을 저장
 
-    // DFS와 BFS 조건 함수를 확인하고 호출
-    const useDFS = typeof useDFSCondition === 'function' ? useDFSCondition(mutation) : false;
-    const useBFS = typeof useBFSCondition === 'function' ? useBFSCondition(mutation) : false;
+            const useDFS = typeof useDFSCondition === 'function' ? useDFSCondition(mutation) : false;
+            const useBFS = typeof useBFSCondition === 'function' ? useBFSCondition(mutation) : false;
 
-    if (useDFS) {
-        updateStateDFS(mutation, newValue);
-    } else if (useBFS) {
-        updateStateBFS(mutation, newValue);
-    } else {
-        // 조건이 충족되지 않는 경우, 추가적인 종속 상태 업데이트는 수행하지 않음
-    }
+            if (useDFS) {
+                updateStateDFS(mutation, newValue).then(resolve).catch(reject);
+            } else if (useBFS) {
+                updateStateBFS(mutation, newValue).then(resolve).catch(reject);
+            } else {
+                resolve(); // 조건이 충족되지 않는 경우, resolve 호출
+            }
 
-    // 구독자에게 변경 알림
-    subscribers[mutation]?.forEach((callback) => callback(newValue)); // 구독자에게 변경 알림
+            // 구독자에게 변경 알림
+            subscribers[mutation]?.forEach((callback) => callback(newValue));
+        } catch (err) {
+            reject(err);
+        }
+    });
 }
 
 // 만료된 캐시 항목을 삭제하는 함수

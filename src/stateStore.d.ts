@@ -19,15 +19,20 @@ interface StateSchema {
 }
 
 export declare function initializeStore(schema: StateSchema): void;
+
 export declare function getState(query: string): any;
-export declare function setStateMutation(mutation: string, newValue: any, useDFSCondition?: (mutation: string) => boolean, useBFSCondition?: (mutation: string) => boolean): void;
+
+// setStateMutation 함수의 반환 타입을 Promise<void>로 수정
+export declare function setStateMutation(mutation: string, newValue: any, useDFSCondition?: (mutation: string) => boolean, useBFSCondition?: (mutation: string) => boolean): Promise<void>;
+
 export declare function subscribeStateChange(stateName: string, callback: (newState: any) => void): () => void;
+
 export declare function getCacheObject(): Record<string, any>;
 
 // 상태 종속성 설정 함수 선언
 export declare function setStateDependencies(dependencies: StateDependencies): void;
 
-// DFS 및 BFS 업데이트 함수 선언
-export declare function updateState(stateKey: string, newValue: any): void;
+// updateState 함수의 반환 타입을 Promise<void>로 수정
+export declare function updateState(stateKey: string, newValue: any): Promise<void>;
 
 export {};
